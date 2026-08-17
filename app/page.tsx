@@ -55,6 +55,32 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natu
     return new File([blob], name, { type: blob.type || "image/png" });
   }
 
+  async function copyTextBestEffort(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = text;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      return copied;
+    }
+  }
+
+  function downloadFile(file: File) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(file);
+    link.download = file.name;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+  }
+
   async function prepareForChatGPT() {
     if (!product) {
       setMessage("Add a clear product image first.");
@@ -63,7 +89,7 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natu
     setStatus("working");
     setMessage("Preparing your Model 01 handoff…");
     try {
-      await navigator.clipboard.writeText(prompt);
+      const copied = await copyTextBestEffort(prompt);
       const files = [
         await assetFile("/model-01/turnaround.png", "model-01-turnaround.png"),
         await assetFile("/model-01/hairstyles.png", "model-01-hairstyles.png"),
@@ -71,35 +97,33 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natu
       ];
       setPrepared(true);
       if (navigator.share && navigator.canShare?.({ files })) {
-        setMessage("Prompt copied. Choose ChatGPT in the share sheet, then paste the prompt.");
-        await navigator.share({ files, title: "Model 01 generation references" });
+        try {
+          setMessage(`${copied ? "Prompt copied. " : "Prompt is ready below. "}Choose ChatGPT in the share sheet.`);
+          await navigator.share({ files, title: "Model 01 generation references" });
+        } catch (shareError) {
+          if (shareError instanceof DOMException && shareError.name === "AbortError") {
+            setStatus("idle");
+            setMessage("Sharing cancelled. Use the fallback buttons below when ready.");
+            return;
+          }
+          files.slice(0, 2).forEach(downloadFile);
+          setMessage(`${copied ? "Prompt copied" : "Select the prompt below and copy it"}. Sharing is blocked here, so the two references were downloaded. Attach them and your product in ChatGPT.`);
+        }
       } else {
-        files.slice(0, 2).forEach((file) => {
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(file);
-          link.download = file.name;
-          link.click();
-          setTimeout(() => URL.revokeObjectURL(link.href), 2000);
-        });
-        setMessage("Prompt copied and references downloaded. Open ChatGPT, attach all three images, then paste.");
-        window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
+        files.slice(0, 2).forEach(downloadFile);
+        setMessage(`${copied ? "Prompt copied" : "Select the prompt below and copy it"}. References downloaded. Open ChatGPT and attach them with your product.`);
       }
       setStatus("idle");
     } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        setStatus("idle");
-        setMessage("Sharing cancelled. Tap again when ready.");
-        return;
-      }
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Could not prepare the ChatGPT handoff.");
     }
   }
 
   async function copyPrompt() {
-    await navigator.clipboard.writeText(prompt);
+    const copied = await copyTextBestEffort(prompt);
     setPrepared(true);
-    setMessage("Prompt copied. Paste it into ChatGPT after attaching the three images.");
+    setMessage(copied ? "Prompt copied. Paste it into ChatGPT after attaching the three images." : "Copying is blocked here. Press and hold the prompt text, then choose Select All → Copy.");
   }
 
   return (
@@ -166,9 +190,10 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natu
               <span className={preview ? "readyFile" : ""}>{preview ? <img src={preview} alt="Product attachment" /> : <i>＋</i>}<b>Product</b></span>
             </div>
             <div className="handoffSteps"><b>On your phone</b><span><i>1</i> Tap “Share to ChatGPT”</span><span><i>2</i> Choose ChatGPT in the share sheet</span><span><i>3</i> Paste the copied prompt and send</span></div>
-            <div className="promptPreview"><span>Prepared prompt</span><p>{prompt}</p></div>
+            <div className="promptPreview"><span>Prepared prompt — press and hold to copy manually</span><textarea readOnly value={prompt} aria-label="Prepared ChatGPT prompt" /></div>
           </div>
-          <div className="actions"><button onClick={copyPrompt}>Copy prompt only</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Open ChatGPT</a></div>
+          <div className="actions"><button onClick={copyPrompt}>Copy prompt</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Open ChatGPT</a></div>
+          <div className="downloadRefs"><span>Blocked sharing?</span><a href="/model-01/turnaround.png" download>Download identity</a><a href="/model-01/hairstyles.png" download>Download hair board</a></div>
           <div className="checklist"><b>Before posting</b><span>✓ Face consistency</span><span>✓ Product details</span><span>✓ Background fit</span><span>Remember TikTok’s AI-generated media label.</span></div>
         </div>
       </section>
