@@ -96,10 +96,47 @@ const DO_DOI_THUONG = {
 } as const;
 
 const ANH_TIEP_THEO = {
-  "Ảnh 2 · Toàn cảnh": "Create a wider establishing shot that clearly shows the full environment and full-body styling.",
-  "Ảnh 3 · Trung cảnh": "Create a medium three-quarter shot with a new natural action and stronger product visibility.",
-  "Ảnh 4 · Cận sản phẩm": "Create a close product-detail shot with the model's face still partially visible and recognizable.",
-  "Ảnh 5 · Khoảnh khắc chuyển động": "Create a candid motion shot—walking, turning, adjusting hair or naturally using the product—with believable fabric and hair movement.",
+  "Ảnh 2 · Khoảnh khắc khác": "Create a clearly different candid moment from the first image, not a minor pose adjustment.",
+  "Ảnh 3 · Đổi góc máy": "Move the camera to a distinctly different side, height and distance while keeping continuity.",
+  "Ảnh 4 · Chi tiết tự nhiên": "Capture an intimate spontaneous detail or interaction rather than a formal product close-up.",
+  "Ảnh 5 · Chuyển động mạnh": "Create the most dynamic candid frame in the sequence with believable body, hair, fabric and environmental movement.",
+} as const;
+
+const CAM_XUC_TIEP = {
+  "Cười lớn che miệng": "laugh openly in a spontaneous unguarded way, with one hand loosely covering part of the smile; eyes naturally crinkle",
+  "Cười mỉm nhìn xa": "give a small warm closed-mouth smile while looking away, as if noticing something pleasant",
+  "Bật cười quay đầu": "be caught mid-laugh while turning the head away from camera",
+  "Tò mò khám phá": "show quiet curiosity while observing or touching something in the environment",
+  "Thư giãn tận hưởng": "look peaceful and fully absorbed in the breeze, light or surroundings",
+  "Tinh nghịch": "show a subtle playful expression and an impulsive candid gesture without looking staged",
+  "Tự chọn khác ảnh trước": "choose a believable emotion that strongly contrasts with the previous frame",
+} as const;
+
+const HUONG_DANG_TIEP = {
+  "Quay lưng khoe thiết kế sau": "show the model mostly from behind to reveal the back of the outfit, with the face only in a natural partial profile if appropriate",
+  "Nghiêng 3/4 quay đi": "use a rear three-quarter body angle, weight shifting naturally as she turns away",
+  "Đi ngang khung hình": "walk naturally across the frame in side profile rather than toward the camera",
+  "Ngồi hoặc tựa tự nhiên": "sit, lean or rest naturally on an available environmental surface with relaxed asymmetry",
+  "Xoay người giữa chuyển động": "capture the torso and hips at different stages of a natural turn, with realistic fabric response",
+  "Tương tác với không gian": "interact naturally with the café, beach, railing, chair, foliage or nearby object instead of presenting to camera",
+  "Tự chọn khác ảnh trước": "select a new body direction, silhouette and action that are visibly different from the previous frame",
+} as const;
+
+const CHUYEN_DONG_TIEP = {
+  "Gió nhẹ": "add a light irregular breeze moving a few hair strands and the edge of the garment",
+  "Gió biển rõ": "use a stronger coastal cross-breeze with directional hair and fabric movement, keeping the face and product readable",
+  "Đang bước": "show believable mid-step momentum, natural arm counter-swing and slight background motion blur",
+  "Chạm tóc tự nhiên": "catch a casual hair-adjusting gesture caused by wind, without covering the face or product",
+  "Tĩnh nhưng có nhịp": "keep the body mostly still while small environmental movement—hair tips, leaves, curtains, people or traffic—adds life",
+  "Tự chọn theo cảnh": "choose a subtle physical and environmental movement appropriate to the location",
+} as const;
+
+const DOI_CANH_TIEP = {
+  "Đổi nhẹ cùng địa điểm": "shift a few meters within the same location, revealing a different nearby wall, table, path, shoreline angle or cluster of people",
+  "Đổi hướng nhìn ra cảnh": "turn the camera toward a different view within the same location—for example from café interior toward street or sea",
+  "Sát biển / quay ra biển": "move closer to the water or rotate toward the sea, showing wind, shoreline depth and natural beach activity",
+  "Góc sau quán / ven đường": "use a less polished side area of the same venue with service details, parked scooters, passing people or textured surfaces",
+  "Giữ nền, đổi hoạt động": "keep the recognizable background but let people, traffic, chairs, cups, shadows and movement progress naturally",
 } as const;
 
 const EN: Record<string,string> = {
@@ -128,7 +165,11 @@ export default function Home() {
   const [anhSang, setAnhSang] = useState<keyof typeof ANH_SANG>("Ánh sáng café cửa sổ");
   const [xoaPhong, setXoaPhong] = useState<keyof typeof XOA_PHONG>("Bokeh tự nhiên");
   const [doiThuong, setDoiThuong] = useState<keyof typeof DO_DOI_THUONG>("Vừa · Tự nhiên");
-  const [anhTiepTheo, setAnhTiepTheo] = useState<keyof typeof ANH_TIEP_THEO>("Ảnh 2 · Toàn cảnh");
+  const [anhTiepTheo, setAnhTiepTheo] = useState<keyof typeof ANH_TIEP_THEO>("Ảnh 2 · Khoảnh khắc khác");
+  const [camXucTiep, setCamXucTiep] = useState<keyof typeof CAM_XUC_TIEP>("Cười lớn che miệng");
+  const [huongDangTiep, setHuongDangTiep] = useState<keyof typeof HUONG_DANG_TIEP>("Tự chọn khác ảnh trước");
+  const [chuyenDongTiep, setChuyenDongTiep] = useState<keyof typeof CHUYEN_DONG_TIEP>("Gió nhẹ");
+  const [doiCanhTiep, setDoiCanhTiep] = useState<keyof typeof DOI_CANH_TIEP>("Đổi nhẹ cùng địa điểm");
   const [ghiChu, setGhiChu] = useState("");
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
@@ -160,11 +201,19 @@ Allow subtle photographic imperfections: gentle sensor grain, slightly imperfect
 
 Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, doiThuong, ghiChu, khongGian, loai, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
 
-  const followUpPrompt = useMemo(() => `Continue the same five-image campaign using the already established Model 01 identity, exact product, Da Nang location, styling, makeup, accessories, lighting, color grade and depth-of-field treatment.
+  const followUpPrompt = useMemo(() => `Continue the same five-image campaign using the already established Model 01 identity, exact product and overall Da Nang lifestyle concept. Preserve the overall time of day while allowing natural variation in light direction, shadows, cloud cover, exposure and atmosphere.
 
-${ANH_TIEP_THEO[anhTiepTheo]}
+SHOT INTENT: ${ANH_TIEP_THEO[anhTiepTheo]}
+FACIAL EMOTION: ${CAM_XUC_TIEP[camXucTiep]}.
+BODY DIRECTION AND ACTION: ${HUONG_DANG_TIEP[huongDangTiep]}.
+MOVEMENT: ${CHUYEN_DONG_TIEP[chuyenDongTiep]}.
+BACKGROUND EVOLUTION: ${DOI_CANH_TIEP[doiCanhTiep]}.
 
-Keep the exact same woman and product. Do not redesign the outfit or product. Maintain continuity in time of day, weather, background architecture, props, ordinary human activity and color palette. Background extras and traffic should evolve naturally between frames rather than freeze or repeat; never duplicate faces, vehicles or poses. Change only the camera distance, angle, natural action and composition so the sequence gives TikTok AutoCut useful visual variety. Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo]);
+Keep the exact same woman and product. Do not redesign the outfit or product. Maintain the same overall time of day and coherent styling, while allowing a different light direction, weather nuance or nearby part of the location. It should feel like another moment from the same outing, not the exact same frozen minute. Let pedestrians, café patrons, traffic, waves, chairs, cups, foliage, shadows and small props change naturally.
+
+Do NOT reuse the previous pose, gaze, facial expression, body direction, hand placement, camera side, framing or exact background arrangement. This is a candid lifestyle sequence, not a set of formally composed hero images. Do not force rule of thirds, golden ratio, perfect symmetry or a polished catalog pose. Slightly imperfect framing, partial foreground occlusion, a tilted horizon within realistic limits, off-center cropping and spontaneous gestures are welcome when they make the moment feel human. Preserve product visibility appropriate to this shot; a back-facing beach view may prioritize showing the back construction of the garment.
+
+Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo, camXucTiep, chuyenDongTiep, doiCanhTiep, huongDangTiep]);
 
   async function layTep(path: string, name: string) { const blob = await (await fetch(path)).blob(); return new File([blob], name, { type: blob.type || "image/png" }); }
   async function saoChep(text: string) { try { await navigator.clipboard.writeText(text); return true; } catch { const x=document.createElement("textarea"); x.value=text; x.readOnly=true; x.style.position="fixed"; x.style.opacity="0"; document.body.appendChild(x); x.select(); const ok=document.execCommand("copy"); x.remove(); return ok; } }
@@ -226,6 +275,10 @@ Keep the exact same woman and product. Do not redesign the outfit or product. Ma
           <div className="promptPreview"><span>PROMPT ĐÃ SOẠN — NHẤN GIỮ ĐỂ SAO CHÉP</span><textarea readOnly value={prompt} aria-label="Prompt tạo ảnh bằng ChatGPT"/></div>
           <div className="continuation">
             <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
+            <Select label="Cảm xúc mới" value={camXucTiep} onChange={v=>setCamXucTiep(v as keyof typeof CAM_XUC_TIEP)} items={Object.keys(CAM_XUC_TIEP)}/>
+            <Select label="Hướng người & hành động" value={huongDangTiep} onChange={v=>setHuongDangTiep(v as keyof typeof HUONG_DANG_TIEP)} items={Object.keys(HUONG_DANG_TIEP)}/>
+            <Select label="Chuyển động & gió" value={chuyenDongTiep} onChange={v=>setChuyenDongTiep(v as keyof typeof CHUYEN_DONG_TIEP)} items={Object.keys(CHUYEN_DONG_TIEP)}/>
+            <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
             <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
             <button className="copyFollow" onClick={copyFollowUp}>Sao chép prompt ảnh tiếp theo</button>
           </div>
