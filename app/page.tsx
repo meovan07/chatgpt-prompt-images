@@ -1,285 +1,226 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
-const HAIRS = [
-  ["H01", "Sleek straight", "Clean & minimal"],
-  ["H02", "Korean waves", "Soft & romantic"],
-  ["H03", "Low ponytail", "Elegant"],
-  ["H04", "High ponytail", "Active & youthful"],
-  ["H05", "Half-up", "Versatile"],
-  ["H06", "Low bun", "Polished"],
+const TOC = [
+  ["H01", "Tóc thẳng ngôi giữa", "Tối giản"], ["H02", "Sóng Hàn mái rèm", "Nàng thơ"],
+  ["H03", "Tóc đuôi ngựa thấp", "Thanh lịch"], ["H04", "Tóc đuôi ngựa cao", "Năng động"],
+  ["H05", "Nửa buộc nửa xõa", "Đa dụng"], ["H06", "Búi thấp", "Sang trọng"],
 ] as const;
 
-const CATEGORIES = ["Fashion / clothing", "Beauty / skincare", "Bag / accessories", "Shoes", "Home / lifestyle", "Fitness"];
+const LOAI_SAN_PHAM = ["Thời trang / quần áo", "Mỹ phẩm / chăm sóc da", "Túi / phụ kiện", "Giày dép", "Đồ gia dụng / phong cách sống", "Thể thao"];
 
-const VIBES = {
-  "Auto style director": "Study the product's color, material, price positioning, and intended customer. Select a coherent location, palette, lighting, styling, and camera treatment that make the product feel desirable without competing with it.",
-  "Soft feminine": "Airy editorial setting in blush, cream, or warm neutral tones; delicate daylight; subtle floral or fabric texture; romantic but uncluttered; soft highlights and graceful movement.",
-  "Clean luxury": "Quiet-luxury interior or refined minimal studio; stone, warm ivory, walnut, or brushed metal accents; controlled directional light; premium editorial composition with generous negative space.",
-  "Korean casual": "Bright modern Seoul-inspired café, apartment, or clean street; milky daylight; pale wood and soft neutral palette; candid youthful styling with a polished smartphone-photo finish.",
-  "Urban street": "Contemporary city architecture, clean concrete and glass, directional late-afternoon light; confident editorial framing; energetic but the background remains softly separated from the product.",
-  "Cozy lifestyle": "Warm lived-in home with natural wood, linen, and soft window light; authentic everyday moment; comfortable and approachable, with carefully controlled clutter.",
-  "Active energy": "Bright fitness studio or clean outdoor active setting; crisp daylight, fresh color accents, dynamic composition, and believable movement without motion blur on the product.",
+const KHONG_GIAN = {
+  "Tự chọn tại Đà Nẵng": "Tự chọn một bối cảnh Đà Nẵng chân thực, phù hợp nhất với sản phẩm và phong cách; có chất địa phương nhưng không biến thành ảnh check-in du lịch.",
+  "Café ven biển": "Café mở gần biển Đà Nẵng, đá sáng màu, gỗ nhạt, ghế vải linen, gió biển và ánh sáng đại dương; tiểu cảnh nhiệt đới và gốm sứ tinh tế.",
+  "Café sân vườn": "Café sân vườn Đà Nẵng nhiều lớp cây nhiệt đới, nắng xuyên tán, tường vữa có chất liệu, lối đi đá và tiểu cảnh được chăm chút.",
+  "Đồi Sơn Trà": "Điểm nhìn trên sườn Sơn Trà với lớp cây xanh, biển xanh xa, chiều sâu khí quyển, gió tự nhiên và ánh sáng giờ vàng.",
+  "Biển Mỹ Khê buổi sớm": "Bãi Mỹ Khê trong nắng sớm dịu, cát sạch, nước xanh nhạt, trời thoáng, ít người; cảm giác editorial ven biển thay vì ảnh du lịch.",
+  "Sông Hàn chiều tối": "Không khí ven sông Hàn vào blue hour, bokeh thành phố và phản chiếu nhẹ, hiện đại sang trọng, không có biển hiệu giả dễ đọc.",
+  "Hẻm miền Trung": "Hẻm hoặc sân trong yên tĩnh với tường vàng ấm, gỗ cũ, hoa giấy và chi tiết thủ công; thơ mộng nhưng không sân khấu hóa.",
 } as const;
 
-const POSES = {
-  "Auto match vibe": "Choose a natural, commercially effective pose that fits the product and selected vibe. The pose must reveal the product clearly and avoid covering important details.",
-  "Walking candid": "Mid-step candid walk, relaxed shoulders, natural arm swing, subtle gaze away from camera; garment and hair show gentle believable movement.",
-  "Confident editorial": "Balanced contrapposto stance, one leg slightly forward, elongated posture, confident direct gaze, one hand relaxed while the other interacts naturally with the product.",
-  "Soft graceful": "Gentle three-quarter body angle, relaxed wrists, slight head tilt, calm expression, elegant S-curve without exaggerated anatomy.",
-  "Product close-up": "Three-quarter crop with the product closest to camera, held or worn naturally; face remains visible while product construction and texture are the visual priority.",
-  "Everyday action": "A believable use moment appropriate to the product—adjusting a strap, smoothing fabric, applying or holding the item—captured between poses rather than staged.",
+const NHAN_VAT = {
+  "Nàng thơ": "Mơ màng, nhẹ nhàng, hướng nội, chuyển động mềm, biểu cảm tự nhiên, khoảnh khắc điện ảnh không gượng ép.",
+  "Tổng tài": "Điềm tĩnh, quyền lực, cao cấp; dáng dứt khoát, biểu cảm tiết chế, kiến trúc hiện đại và tinh thần quiet luxury.",
+  "Tiểu thư": "Nữ tính tinh tế, chỉn chu, duyên dáng và hơi tinh nghịch; café hoặc sân vườn cao cấp.",
+  "Cô gái phố biển": "Tươi mới, thư giãn, nhiều nắng; gió tự nhiên, chuyển động đời thường và phong cách sống Đà Nẵng hiện đại.",
+  "Editorial tối giản": "Tạo dáng điêu khắc, đường nét sạch, nhiều khoảng thở và cảm giác tạp chí thời trang cao cấp.",
 } as const;
 
-const DANANG_SCENES = {
-  "Auto Đà Nẵng": "Choose an authentic Đà Nẵng setting that best supports the product and selected archetype; recognizable local atmosphere without turning the image into a tourist postcard.",
-  "Coastal café": "A refined open-air café near the Đà Nẵng coast, pale stone, light wood, linen seating, sea breeze and soft ocean light; tasteful tiểu cảnh with tropical greenery and ceramic details.",
-  "Garden café": "A photogenic Đà Nẵng garden café with layered tropical plants, dappled daylight, textured plaster, stone path and a curated tiểu cảnh; calm, intimate and believable.",
-  "Sơn Trà overlook": "A scenic Sơn Trà hillside viewpoint with layered green landscape and distant blue sea, soft atmospheric depth, natural breeze and elegant golden-hour light.",
-  "Mỹ Khê morning": "Mỹ Khê beach in gentle early-morning light, clean sand, pale blue water and airy sky; minimal people, refined coastal editorial mood, not a tourist snapshot.",
-  "Hàn River evening": "Modern riverside Đà Nẵng ambience near the Hàn River at blue hour, subtle city bokeh and reflections, premium urban mood without fake readable signage.",
-  "Old-town inspired": "A quiet central-Vietnam lane or courtyard with warm ochre walls, weathered wood, bougainvillea and handcrafted details; poetic rather than theme-park styling.",
+const BO_CUC = {
+  "Quy tắc 1/3": "Đặt người mẫu trên một đường 1/3, hướng nhìn hoặc chuyển động vào khoảng trống; sản phẩm nằm gần một điểm giao.",
+  "Tỷ lệ vàng": "Dẫn mắt theo đường xoắn ốc tỷ lệ vàng từ không gian đến gương mặt rồi kết thúc tại sản phẩm.",
+  "Đường dẫn": "Dùng kiến trúc, quầy café, lối đi, bờ biển hoặc lan can làm đường dẫn mắt đến người mẫu và sản phẩm.",
+  "Khung trong khung": "Dùng cửa, cửa sổ, vòm, cây lá hoặc tiểu cảnh để tạo khung tự nhiên, không che sản phẩm.",
+  "Khoảng trống": "Bố cục bất đối xứng, nhiều negative space, silhouette rõ và sản phẩm dễ đọc.",
+  "Chiều sâu nhiều lớp": "Tiền cảnh mờ nhẹ, chủ thể sắc nét, hậu cảnh có chiều sâu khí quyển để tạo cảm giác điện ảnh.",
 } as const;
 
-const ARCHETYPES = {
-  "Nàng thơ": "Poetic muse energy: dreamy, gentle, introspective and effortless; delicate movement, soft natural expression, airy fabric and a quietly cinematic moment.",
-  "Tổng tài": "Modern executive energy: composed, powerful and premium; clean silhouette, decisive posture, restrained expression, architectural background and quiet-luxury styling.",
-  "Tiểu thư": "Refined feminine elegance: polished, graceful and slightly playful; tasteful details, pristine styling, gentle confidence and upscale café or garden atmosphere.",
-  "Cô gái phố biển": "Fresh coastal-city energy: relaxed, sunlit and approachable; natural breeze, candid motion and contemporary Đà Nẵng lifestyle styling.",
-  "Minimal editorial": "Fashion-magazine restraint: sculptural pose, clean lines, strong negative space and an understated premium mood.",
+const DANG = {
+  "Tự chọn theo vibe": "Tự chọn dáng tự nhiên và hiệu quả thương mại; phải nhìn rõ sản phẩm và không che chi tiết quan trọng.",
+  "Bước đi tự nhiên": "Khoảnh khắc đang bước, vai thả lỏng, tay chuyển động tự nhiên, tóc và vải có độ bay vừa phải.",
+  "Editorial tự tin": "Dáng contrapposto cân bằng, một chân hơi đưa trước, tư thế cao, một tay tương tác tự nhiên với sản phẩm.",
+  "Mềm mại duyên dáng": "Góc người ba phần tư, cổ tay thả lỏng, đầu hơi nghiêng, đường cong cơ thể thanh lịch nhưng không cường điệu.",
+  "Cận cảnh sản phẩm": "Khung ba phần tư, sản phẩm gần máy ảnh hơn, gương mặt vẫn thấy rõ, chất liệu và cấu tạo là trọng tâm.",
+  "Hành động đời thường": "Một hành động hợp sản phẩm như chỉnh quai, vuốt vải, cầm cốc hoặc sử dụng sản phẩm; cảm giác bắt gặp giữa khoảnh khắc.",
 } as const;
 
-const COMPOSITIONS = {
-  "Rule of thirds": "Place the model on a vertical third with gaze or movement directed into open space; keep the product near an intersection point.",
-  "Golden ratio": "Arrange the visual flow along a subtle golden spiral, leading from environment to face and finally to the product as the focal point.",
-  "Leading lines": "Use architecture, a café counter, path, shoreline or railing as leading lines toward the model and product.",
-  "Frame within frame": "Use a doorway, window, foliage, arch or curated tiểu cảnh to frame the model naturally without obstructing the product.",
-  "Negative space": "Use generous clean space and asymmetric editorial balance; preserve a strong silhouette and uncluttered product readability.",
-  "Layered depth": "Use a soft foreground element, sharp subject plane and atmospheric background to create cinematic depth and an observational feeling.",
+const ANH_MAT = {
+  "Nhìn lệch tự nhiên": "Không nhìn vào máy ảnh; nhìn nhẹ về phía không gian, như được chụp trong khoảnh khắc không sắp đặt.",
+  "Nhìn sản phẩm": "Nhìn tự nhiên vào sản phẩm hoặc bàn tay đang tương tác, biểu cảm hài lòng nhẹ, không giống tư thế bán hàng.",
+  "Nghiêng mặt nhìn xa": "Gương mặt ba phần tư hoặc profile sạch, nhìn xa; vẫn bảo toàn nhận diện khuôn mặt.",
+  "Hạ mắt nhẹ": "Ánh mắt hạ nhẹ, mí thư giãn, hướng nội nhưng không buồn hoặc buồn ngủ.",
+  "Mải mê hành động": "Tập trung vào việc bước đi, chỉnh tóc, chạm ly hoặc dùng sản phẩm; hoàn toàn không chú ý máy ảnh.",
 } as const;
 
-const GAZES = {
-  "Natural look away": "Do not look into the camera. Gaze softly toward the environment or product, as if caught in a genuine unposed moment.",
-  "Admire product": "Look naturally at the product or the hand interacting with it, with a subtle pleased expression rather than a sales pose.",
-  "Profile distance": "Turn the face into a clean three-quarter or side profile and look into the distance; preserve recognizable facial identity.",
-  "Eyes lowered": "Use a gentle downward gaze with relaxed eyelids and an introspective expression; avoid appearing sad or sleepy.",
-  "Candid interaction": "Focus attention on a natural action in the scene—walking, adjusting hair, touching a cup, or using the product—with no awareness of the camera.",
+const TRANG_DIEM = {
+  "Trong veo Hàn Quốc": "Nền da căng nhẹ tự nhiên, má hồng trong, mi tơi, môi hồng đào bóng vừa; không làm thay đổi đường nét gương mặt.",
+  "Trang điểm nàng thơ": "Nền mỏng, má hồng lan nhẹ, mắt nâu hồng mềm, môi rose-beige; cảm giác dịu và mơ màng.",
+  "Clean girl": "Da sạch bán lì, chân mày gọn tự nhiên, eyeliner cực mảnh, môi nude hồng; tối giản và hiện đại.",
+  "Tổng tài sắc nét": "Nền satin, contour rất nhẹ, mắt nâu trung tính có độ sâu, môi đỏ nâu hoặc nude lạnh; quyền lực nhưng không già.",
+  "Nắng biển": "Da glow khỏe, tàn nhang cực nhẹ nếu hợp, má coral, môi tint trong; tươi và chịu được ánh sáng ngoài trời.",
+  "Gần như không trang điểm": "Giữ texture da thật, chỉ cân bằng sắc da, môi dưỡng và mi tự nhiên; không filter, không da nhựa.",
 } as const;
+
+const PHU_KIEN = {
+  "Tối giản tự động": "Chỉ thêm phụ kiện tối thiểu phù hợp với sản phẩm; không cạnh tranh, che khuất hoặc tạo thêm sản phẩm tương tự.",
+  "Ngọc trai tinh tế": "Khuyên tai ngọc trai nhỏ hoặc vòng cổ mảnh; thanh lịch, nữ tính, không quá dạ hội.",
+  "Kim loại tối giản": "Khuyên tai hoặc vòng tay kim loại mảnh màu vàng nhạt/bạc tùy bảng màu sản phẩm.",
+  "Kính thời trang": "Kính râm hoặc kính gọng mảnh được cầm hoặc đeo tự nhiên; không che toàn bộ gương mặt nếu cần nhận diện.",
+  "Khăn lụa": "Khăn lụa nhỏ phối ở cổ, tóc hoặc quai túi nếu hợp; màu bổ trợ sản phẩm, không có logo giả.",
+  "Không phụ kiện": "Không thêm trang sức, kính, mũ, khăn hoặc đạo cụ thời trang ngoài sản phẩm chính.",
+} as const;
+
+const ANH_SANG = {
+  "Tự chọn theo bối cảnh": "Tự chọn thời điểm và ánh sáng tự nhiên nhất cho không gian, sản phẩm và nhân vật.",
+  "Nắng sớm dịu": "Ánh sáng sớm mềm, trong và hơi ấm, bóng đổ dài nhẹ, da tự nhiên.",
+  "Nắng xuyên tán": "Ánh sáng loang qua cây hoặc rèm, tạo lớp sáng tối tinh tế nhưng không đổ họa tiết khó chịu lên sản phẩm.",
+  "Giờ vàng": "Nắng vàng thấp, viền tóc nhẹ, chiều sâu ấm và lãng mạn; giữ đúng màu sản phẩm.",
+  "Blue hour": "Ánh sáng xanh tím sau hoàng hôn kết hợp đèn thực tế ấm, sang và điện ảnh.",
+  "Ánh sáng café cửa sổ": "Nguồn sáng cửa sổ lớn mềm từ một bên, nền café có chiều sâu và da không bị phẳng.",
+} as const;
+
+const XOA_PHONG = {
+  "Bokeh tự nhiên": "Use realistic optical background blur from a wide-aperture portrait lens, with smooth bokeh, gradual depth falloff and sharp product edges; never use artificial cutout blur.",
+  "Mờ tiền cảnh điện ảnh": "Add a subtle out-of-focus foreground layer such as foliage, a café edge or reflected light, while the model and product remain precisely focused.",
+  "Hậu cảnh vừa đủ rõ": "Use moderate depth of field: the setting remains recognizable but softened enough to separate the silhouette and product naturally.",
+  "Nét sâu tự nhiên": "Use deeper natural focus for landscape or architectural context, while preserving tonal separation around the model.",
+} as const;
+
+const ANH_TIEP_THEO = {
+  "Ảnh 2 · Toàn cảnh": "Create a wider establishing shot that clearly shows the full environment and full-body styling.",
+  "Ảnh 3 · Trung cảnh": "Create a medium three-quarter shot with a new natural action and stronger product visibility.",
+  "Ảnh 4 · Cận sản phẩm": "Create a close product-detail shot with the model's face still partially visible and recognizable.",
+  "Ảnh 5 · Khoảnh khắc chuyển động": "Create a candid motion shot—walking, turning, adjusting hair or naturally using the product—with believable fabric and hair movement.",
+} as const;
+
+const EN: Record<string,string> = {
+  "Thời trang / quần áo":"fashion or clothing", "Mỹ phẩm / chăm sóc da":"beauty or skincare", "Túi / phụ kiện":"bag or accessory", "Giày dép":"footwear", "Đồ gia dụng / phong cách sống":"home or lifestyle product", "Thể thao":"fitness product",
+  "Tự chọn tại Đà Nẵng":"an authentic Da Nang setting selected to suit the product, not a tourist postcard", "Café ven biển":"a refined open-air coastal café in Da Nang with pale stone, light wood, linen seating, sea breeze and tasteful tropical vignettes", "Café sân vườn":"a photogenic Da Nang garden café with layered tropical foliage, dappled daylight, textured plaster, stone paths and curated miniature landscaping", "Đồi Sơn Trà":"a Son Tra hillside overlook with layered greenery, distant blue sea, atmospheric depth and natural breeze", "Biển Mỹ Khê buổi sớm":"My Khe beach in soft early-morning light with clean sand, pale blue water, airy sky and minimal people", "Sông Hàn chiều tối":"the Han River waterfront at blue hour with subtle city bokeh and reflections", "Hẻm miền Trung":"a quiet Central Vietnamese lane or courtyard with warm ochre walls, weathered wood, bougainvillea and handcrafted details",
+  "Nàng thơ":"poetic muse—dreamy, gentle, introspective and effortlessly cinematic", "Tổng tài":"modern executive—composed, powerful, premium and quiet-luxury", "Tiểu thư":"refined young-lady elegance—polished, graceful and subtly playful", "Cô gái phố biển":"fresh coastal-city woman—relaxed, sunlit, approachable and contemporary", "Editorial tối giản":"minimal fashion editorial—sculptural, restrained and premium",
+  "Tự chọn theo vibe":"a natural commercially effective pose selected to match the concept", "Bước đi tự nhiên":"a candid mid-step walk with relaxed shoulders and believable hair and fabric movement", "Editorial tự tin":"a confident balanced contrapposto pose with one leg slightly forward", "Mềm mại duyên dáng":"a graceful three-quarter angle with relaxed wrists and a subtle head tilt", "Cận cảnh sản phẩm":"a three-quarter product-priority pose with the face still visible", "Hành động đời thường":"a believable everyday action appropriate to the product",
+  "Nhìn lệch tự nhiên":"look naturally away from the camera into the environment", "Nhìn sản phẩm":"look naturally at the product or the hand interacting with it", "Nghiêng mặt nhìn xa":"use a recognizable three-quarter or side profile looking into the distance", "Hạ mắt nhẹ":"use a gentle lowered gaze with a calm introspective expression", "Mải mê hành động":"focus fully on a natural action with no awareness of the camera",
+  "Quy tắc 1/3":"rule of thirds, placing the model on a vertical third and the product near an intersection", "Tỷ lệ vàng":"golden-ratio visual flow leading from environment to face and then product", "Đường dẫn":"leading lines from architecture, paths, shoreline or café elements toward the model", "Khung trong khung":"frame-within-a-frame using a doorway, foliage, arch or curated vignette", "Khoảng trống":"asymmetric editorial negative space with a strong readable silhouette", "Chiều sâu nhiều lớp":"layered depth with a soft foreground, sharp subject plane and atmospheric background",
+  "Trong veo Hàn Quốc":"sheer Korean makeup with luminous natural skin, soft blush, separated lashes and peach-pink lips", "Trang điểm nàng thơ":"poetic makeup with delicate rosy tones, soft brown-pink eyes and rose-beige lips", "Clean girl":"clean-girl makeup with natural brows, minimal liner and pink-nude lips", "Tổng tài sắc nét":"polished executive makeup with satin skin, subtle contour, neutral brown eyes and refined lips", "Nắng biển":"healthy coastal glow with coral blush and translucent lip tint", "Gần như không trang điểm":"near-bare makeup preserving real skin texture",
+  "Tối giản tự động":"minimal accessories automatically selected to support rather than compete with the product", "Ngọc trai tinh tế":"small pearl earrings or a fine necklace", "Kim loại tối giản":"fine minimal gold or silver jewelry matched to the product palette", "Kính thời trang":"slim fashion eyewear used naturally without hiding identity", "Khăn lụa":"a small silk scarf styled at the neck, hair or bag in a complementary color", "Không phụ kiện":"no jewelry, eyewear, hat, scarf or extra fashion props",
+  "Tự chọn theo bối cảnh":"lighting naturally selected for the scene and concept", "Nắng sớm dịu":"soft clear early-morning light with gentle warmth", "Nắng xuyên tán":"dappled light filtered through foliage or curtains", "Giờ vàng":"low golden-hour light with a subtle hair rim", "Blue hour":"blue-hour ambient light balanced with warm practical lights", "Ánh sáng café cửa sổ":"large soft side-window light with natural café depth",
+  "Tóc thẳng ngôi giữa":"sleek long straight center-part hair", "Sóng Hàn mái rèm":"soft Korean waves with curtain bangs", "Tóc đuôi ngựa thấp":"elegant low ponytail", "Tóc đuôi ngựa cao":"polished high ponytail", "Nửa buộc nửa xõa":"half-up half-down hair", "Búi thấp":"neat low bun",
+};
 
 export default function Home() {
-  const [product, setProduct] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
-  const [hair, setHair] = useState("H02");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [vibe, setVibe] = useState<keyof typeof VIBES>("Auto style director");
-  const [pose, setPose] = useState<keyof typeof POSES>("Auto match vibe");
-  const [scene, setScene] = useState<keyof typeof DANANG_SCENES>("Auto Đà Nẵng");
-  const [archetype, setArchetype] = useState<keyof typeof ARCHETYPES>("Nàng thơ");
-  const [composition, setComposition] = useState<keyof typeof COMPOSITIONS>("Rule of thirds");
-  const [gaze, setGaze] = useState<keyof typeof GAZES>("Natural look away");
-  const [note, setNote] = useState("");
-  const [prepared, setPrepared] = useState(false);
-  const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
-  const [message, setMessage] = useState("");
-  const libraryInput = useRef<HTMLInputElement>(null);
-  const cameraInput = useRef<HTMLInputElement>(null);
+  const [toc, setToc] = useState("H02");
+  const [loai, setLoai] = useState(LOAI_SAN_PHAM[0]);
+  const [khongGian, setKhongGian] = useState<keyof typeof KHONG_GIAN>("Café sân vườn");
+  const [nhanVat, setNhanVat] = useState<keyof typeof NHAN_VAT>("Nàng thơ");
+  const [boCuc, setBoCuc] = useState<keyof typeof BO_CUC>("Quy tắc 1/3");
+  const [dang, setDang] = useState<keyof typeof DANG>("Tự chọn theo vibe");
+  const [anhMat, setAnhMat] = useState<keyof typeof ANH_MAT>("Nhìn lệch tự nhiên");
+  const [trangDiem, setTrangDiem] = useState<keyof typeof TRANG_DIEM>("Trong veo Hàn Quốc");
+  const [phuKien, setPhuKien] = useState<keyof typeof PHU_KIEN>("Tối giản tự động");
+  const [anhSang, setAnhSang] = useState<keyof typeof ANH_SANG>("Ánh sáng café cửa sổ");
+  const [xoaPhong, setXoaPhong] = useState<keyof typeof XOA_PHONG>("Bokeh tự nhiên");
+  const [anhTiepTheo, setAnhTiepTheo] = useState<keyof typeof ANH_TIEP_THEO>("Ảnh 2 · Toàn cảnh");
+  const [ghiChu, setGhiChu] = useState("");
+  const [daChuanBi, setDaChuanBi] = useState(false);
+  const [thongBao, setThongBao] = useState("");
+  const [dangXuLy, setDangXuLy] = useState(false);
+  const tocDaChon = TOC.find((item) => item[0] === toc);
 
-  const selectedHair = useMemo(() => HAIRS.find((item) => item[0] === hair), [hair]);
+  const prompt = useMemo(() => `Use the two attached Model 01 images as strict identity references. I will attach the product image separately in ChatGPT; treat the last product image as the exact product reference.
 
-  function chooseProduct(file?: File) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setMessage("Please choose a JPG, PNG, or WebP product image.");
-      return;
-    }
-    if (preview) URL.revokeObjectURL(preview);
-    setProduct(file);
-    setPreview(URL.createObjectURL(file));
-    setPrepared(false);
-    setMessage("");
-  }
+Create the exact same adult woman from Model 01 wearing, holding or using the product. Preserve her facial geometry, apparent age 22–26, skin tone, eyes, nose, lips, neck, slender build and body proportions. Hairstyle ${toc}: ${EN[tocDaChon?.[1] ?? ""]}. Do not change her identity, ethnicity, age or body shape.
 
-  const prompt = useMemo(() => `Use the attached Model 01 turnaround and hairstyle board as identity references. Use the third attached image as the exact product reference.
+Product category: ${EN[loai]}. Preserve the product's exact color, material, construction, proportions, pattern and logo placement. Keep it clear and unobstructed by hands, hair or accessories.
 
-Create the same adult woman wearing or using the product. Preserve her facial geometry, apparent age 22–26, warm fair skin tone, eyes, nose, lips, neck, slender build, and body proportions. Use hairstyle ${hair}: ${selectedHair?.[1] ?? hair}. Do not change her identity, ethnicity, age, or body shape.
+Da Nang setting: ${EN[khongGian]}.
+Character archetype: ${EN[nhanVat]}.
+Pose: ${EN[dang]}.
+Gaze: ${EN[anhMat]}; do not look into the camera.
+Composition: ${EN[boCuc]}.
+Makeup: ${EN[trangDiem]}; preserve facial identity and real skin texture.
+Accessories: ${EN[phuKien]}.
+Lighting: ${EN[anhSang]}.
+Depth of field: ${XOA_PHONG[xoaPhong]}
 
-Preserve the product's exact color, material, construction, proportions, print, and logo placement. Keep it unobstructed and visually prominent.
+Unify the location, palette, lighting, hair movement, expression, accessories, camera angle and pose into one coherent campaign concept. Use complementary color or tonal contrast so the product separates clearly. Keep the background realistic, dimensional and secondary. The model should feel observed in an authentic moment, never posed directly at the viewer. ${ghiChu ? `Additional direction: ${ghiChu}.` : "Prioritize a lively, tasteful and believable moment over a rigid catalog pose."}
 
-Product category: ${category}.
+Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, ghiChu, khongGian, loai, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
 
-Creative direction — ${vibe}: ${VIBES[vibe]}
+  const followUpPrompt = useMemo(() => `Continue the same five-image campaign using the already established Model 01 identity, exact product, Da Nang location, styling, makeup, accessories, lighting, color grade and depth-of-field treatment.
 
-Đà Nẵng location — ${scene}: ${DANANG_SCENES[scene]}
+${ANH_TIEP_THEO[anhTiepTheo]}
 
-Visual archetype — ${archetype}: ${ARCHETYPES[archetype]}
+Keep the exact same woman and product. Do not redesign the outfit or product. Maintain continuity in time of day, weather, background architecture, props and color palette. Change only the camera distance, angle, natural action and composition so the sequence gives TikTok AutoCut useful visual variety. Preserve realistic optical background blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo]);
 
-Pose direction — ${pose}: ${POSES[pose]}
+  async function layTep(path: string, name: string) { const blob = await (await fetch(path)).blob(); return new File([blob], name, { type: blob.type || "image/png" }); }
+  async function saoChep(text: string) { try { await navigator.clipboard.writeText(text); return true; } catch { const x=document.createElement("textarea"); x.value=text; x.readOnly=true; x.style.position="fixed"; x.style.opacity="0"; document.body.appendChild(x); x.select(); const ok=document.execCommand("copy"); x.remove(); return ok; } }
+  function taiTep(file: File) { const a=document.createElement("a"); a.href=URL.createObjectURL(file); a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
 
-Gaze — ${gaze}: ${GAZES[gaze]}
-
-Photographic composition — ${composition}: ${COMPOSITIONS[composition]}
-
-Make the environment, lighting, hair movement, expression, camera height, lens perspective, and pose feel like one coherent campaign. Match background colors to the product using complementary or tonal contrast; do not place a product against a similar-value background where its silhouette disappears. Keep background detail secondary with realistic depth separation. ${note ? `Additional direction: ${note}.` : "Prioritize an authentic, aspirational lifestyle moment rather than a rigid catalog pose."}
-
-Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Use an eye-level or slightly low camera angle that flatters the product. The model must feel observed rather than posing for the viewer; no direct eye contact unless explicitly requested in the additional direction. Natural anatomy and hands. No text, watermark, interface elements, or additional products.`, [archetype, category, composition, gaze, hair, note, pose, scene, selectedHair, vibe]);
-
-  async function assetFile(path: string, name: string) {
-    const blob = await (await fetch(path)).blob();
-    return new File([blob], name, { type: blob.type || "image/png" });
-  }
-
-  async function copyTextBestEffort(text: string) {
+  async function chiaSe() {
+    setDangXuLy(true); setThongBao("Đang chuẩn bị concept và ảnh tham chiếu…");
     try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      const field = document.createElement("textarea");
-      field.value = text;
-      field.setAttribute("readonly", "");
-      field.style.position = "fixed";
-      field.style.opacity = "0";
-      document.body.appendChild(field);
-      field.select();
-      const copied = document.execCommand("copy");
-      field.remove();
-      return copied;
-    }
+      const copied=await saoChep(prompt);
+      const files=[await layTep("/model-01/turnaround.png","model-01-goc-nhin.png"),await layTep("/model-01/hairstyles.png","model-01-kieu-toc.png")];
+      setDaChuanBi(true);
+      if(navigator.share&&navigator.canShare?.({files})){
+        try{setThongBao(`${copied?"Đã sao chép prompt. ":"Prompt ở bên dưới. "}Hãy chọn ChatGPT, sau đó thêm ảnh sản phẩm.`);await navigator.share({files,title:"Tham chiếu Model 01"});}
+        catch(e){if(e instanceof DOMException&&e.name==="AbortError"){setThongBao("Đã hủy chia sẻ. Bạn có thể dùng các nút dự phòng bên dưới.");}else{files.forEach(taiTep);setThongBao("Trình duyệt chặn chia sẻ. Hai ảnh tham chiếu đã được tải xuống; hãy đính kèm chúng và ảnh sản phẩm trong ChatGPT.");}}
+      }else{files.forEach(taiTep);setThongBao(`${copied?"Đã sao chép prompt. ":"Hãy sao chép prompt bên dưới. "}Hai ảnh tham chiếu đã được tải xuống.`);}
+    }catch(e){setThongBao(e instanceof Error?e.message:"Không thể chuẩn bị nội dung.");}
+    finally{setDangXuLy(false);}
   }
 
-  function downloadFile(file: File) {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(file);
-    link.download = file.name;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(link.href), 2000);
-  }
+  async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);setThongBao(ok?"Đã sao chép prompt. Hãy dán vào ChatGPT sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
+  async function copyFollowUp(){const ok=await saoChep(followUpPrompt);setThongBao(ok?"Đã sao chép prompt cho ảnh tiếp theo. Hãy dán vào đúng cuộc trò chuyện đã tạo ảnh đầu tiên.":"Hãy nhấn giữ prompt tiếp nối rồi chọn Tất cả → Sao chép.");}
 
-  async function prepareForChatGPT() {
-    if (!product) {
-      setMessage("Add a clear product image first.");
-      return;
-    }
-    setStatus("working");
-    setMessage("Preparing your Model 01 handoff…");
-    try {
-      const copied = await copyTextBestEffort(prompt);
-      const files = [
-        await assetFile("/model-01/turnaround.png", "model-01-turnaround.png"),
-        await assetFile("/model-01/hairstyles.png", "model-01-hairstyles.png"),
-        new File([product], product.name || "product.png", { type: product.type }),
-      ];
-      setPrepared(true);
-      if (navigator.share && navigator.canShare?.({ files })) {
-        try {
-          setMessage(`${copied ? "Prompt copied. " : "Prompt is ready below. "}Choose ChatGPT in the share sheet.`);
-          await navigator.share({ files, title: "Model 01 generation references" });
-        } catch (shareError) {
-          if (shareError instanceof DOMException && shareError.name === "AbortError") {
-            setStatus("idle");
-            setMessage("Sharing cancelled. Use the fallback buttons below when ready.");
-            return;
-          }
-          files.slice(0, 2).forEach(downloadFile);
-          setMessage(`${copied ? "Prompt copied" : "Select the prompt below and copy it"}. Sharing is blocked here, so the two references were downloaded. Attach them and your product in ChatGPT.`);
-        }
-      } else {
-        files.slice(0, 2).forEach(downloadFile);
-        setMessage(`${copied ? "Prompt copied" : "Select the prompt below and copy it"}. References downloaded. Open ChatGPT and attach them with your product.`);
-      }
-      setStatus("idle");
-    } catch (error) {
-      setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Could not prepare the ChatGPT handoff.");
-    }
-  }
+  const Select = ({label,value,onChange,items}:{label:string;value:string;onChange:(v:string)=>void;items:string[]}) => <label><span>{label}</span><select value={value} onChange={(e)=>onChange(e.target.value)}>{items.map(i=><option key={i}>{i}</option>)}</select></label>;
 
-  async function copyPrompt() {
-    const copied = await copyTextBestEffort(prompt);
-    setPrepared(true);
-    setMessage(copied ? "Prompt copied. Paste it into ChatGPT after attaching the three images." : "Copying is blocked here. Press and hold the prompt text, then choose Select All → Copy.");
-  }
-
-  return (
-    <main>
-      <header className="topbar">
-        <div className="brand"><span className="brandMark">M1</span><span>Model Studio</span></div>
-        <div className="secure"><span /> Private workspace</div>
-      </header>
-
-      <section className="hero">
-        <div>
-          <p className="eyebrow">TIKTOK AFFILIATE CREATOR</p>
-          <h1>One model.<br /><em>Every product.</em></h1>
-          <p className="subhead">Upload a product, choose a hairstyle, and create a consistent 9:16 image with Model 01.</p>
+  return <main>
+    <header className="topbar"><div className="brand"><span className="brandMark">M1</span><span>Studio Người Mẫu</span></div><div className="secure"><span/> Không gian riêng tư</div></header>
+    <section className="hero"><div><p className="eyebrow">SÁNG TẠO TIKTOK AFFILIATE</p><h1>Một người mẫu.<br/><em>Mọi phong cách.</em></h1><p className="subhead">Chọn concept, trang điểm và phụ kiện. Sản phẩm sẽ được thêm trực tiếp trong ChatGPT.</p></div><div className="modelCard"><img src="/model-01/turnaround.png" alt="Các góc nhìn Model 01"/><div><b>MODEL 01</b><span>Đã khóa nhận diện</span></div></div></section>
+    <section className="workspace">
+      <div className="panel controls">
+        <div className="step"><span>1</span><div><b>Chọn kiểu tóc</b><small>Khuôn mặt và hình thể luôn được giữ nguyên</small></div></div>
+        <div className="hairGrid">{TOC.map(([id,name,vibe],i)=><button key={id} className={toc===id?"selected":""} onClick={()=>setToc(id)}><span className="hairCrop" style={{backgroundPosition:`${(i%3)*50}% ${i<3?"0%":"100%"}`}}/><b>{id} · {name}</b><small>{vibe}</small></button>)}</div>
+        <div className="step"><span>2</span><div><b>Đạo diễn concept</b><small>Đà Nẵng, nhân vật, dáng và bố cục</small></div></div>
+        <div className="directionFields">
+          <Select label="Nhóm sản phẩm" value={loai} onChange={setLoai} items={LOAI_SAN_PHAM}/>
+          <Select label="Không gian Đà Nẵng" value={khongGian} onChange={v=>setKhongGian(v as keyof typeof KHONG_GIAN)} items={Object.keys(KHONG_GIAN)}/>
+          <Select label="Hình tượng" value={nhanVat} onChange={v=>setNhanVat(v as keyof typeof NHAN_VAT)} items={Object.keys(NHAN_VAT)}/>
+          <Select label="Dáng chụp" value={dang} onChange={v=>setDang(v as keyof typeof DANG)} items={Object.keys(DANG)}/>
+          <Select label="Ánh mắt" value={anhMat} onChange={v=>setAnhMat(v as keyof typeof ANH_MAT)} items={Object.keys(ANH_MAT)}/>
+          <Select label="Bố cục nhiếp ảnh" value={boCuc} onChange={v=>setBoCuc(v as keyof typeof BO_CUC)} items={Object.keys(BO_CUC)}/>
         </div>
-        <div className="modelCard">
-          <img src="/model-01/turnaround.png" alt="Model 01 reference views" />
-          <div><b>MODEL 01</b><span>Identity locked</span></div>
+        <div className="step styleStep"><span>3</span><div><b>Hoàn thiện vẻ ngoài</b><small>Trang điểm, phụ kiện và ánh sáng</small></div></div>
+        <div className="directionFields">
+          <Select label="Trang điểm" value={trangDiem} onChange={v=>setTrangDiem(v as keyof typeof TRANG_DIEM)} items={Object.keys(TRANG_DIEM)}/>
+          <Select label="Phụ kiện" value={phuKien} onChange={v=>setPhuKien(v as keyof typeof PHU_KIEN)} items={Object.keys(PHU_KIEN)}/>
+          <Select label="Ánh sáng" value={anhSang} onChange={v=>setAnhSang(v as keyof typeof ANH_SANG)} items={Object.keys(ANH_SANG)}/>
+          <Select label="Độ mờ hậu cảnh" value={xoaPhong} onChange={v=>setXoaPhong(v as keyof typeof XOA_PHONG)} items={Object.keys(XOA_PHONG)}/>
         </div>
-      </section>
-
-      <section className="workspace">
-        <div className="panel controls">
-          <div className="step"><span>1</span><div><b>Add the product</b><small>Use a clear front-facing image</small></div></div>
-          <div className={`dropzone ${preview ? "hasImage" : ""}`}>
-            {preview ? <img src={preview} alt="Selected product" /> : <><strong>＋</strong><b>Choose product image</b><small>JPG, PNG or WebP</small></>}
-            {preview && <span className="replace">Ready to use</span>}
+        <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
+        <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
+        <button className="generate" onClick={chiaSe} disabled={dangXuLy}>{dangXuLy?"Đang chuẩn bị…":"Chia sẻ sang ChatGPT"}<span>Không cần API key</span></button>
+        {thongBao&&<p className="message">{thongBao}</p>}
+      </div>
+      <div className="panel resultPanel">
+        <div className="resultTitle"><div><b>Chuyển sang ChatGPT</b><small>Model 01 · {toc} · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã chuẩn bị":"2 ảnh tham chiếu"}</span></div>
+        <div className="handoff">
+          <div className="handoffFiles"><span><img src="/model-01/turnaround.png" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.png" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
+          <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Bấm “Chia sẻ sang ChatGPT”</span><span><i>2</i> Thêm ảnh sản phẩm trực tiếp trong ChatGPT</span><span><i>3</i> Dán prompt đã sao chép và gửi</span></div>
+          <div className="promptPreview"><span>PROMPT ĐÃ SOẠN — NHẤN GIỮ ĐỂ SAO CHÉP</span><textarea readOnly value={prompt} aria-label="Prompt tạo ảnh bằng ChatGPT"/></div>
+          <div className="continuation">
+            <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
+            <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
+            <button className="copyFollow" onClick={copyFollowUp}>Sao chép prompt ảnh tiếp theo</button>
           </div>
-          <div className="sourceButtons">
-            <button type="button" onClick={() => libraryInput.current?.click()}><b>Photo library / Files</b><span>Choose an image on this device</span></button>
-            <button type="button" onClick={() => cameraInput.current?.click()}><b>Take a photo</b><span>Use the rear camera</span></button>
-          </div>
-          <input ref={libraryInput} className="hiddenFile" type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" onChange={(event) => chooseProduct(event.target.files?.[0])} />
-          <input ref={cameraInput} className="hiddenFile" type="file" accept="image/*" capture="environment" onChange={(event) => chooseProduct(event.target.files?.[0])} />
-
-          <div className="step"><span>2</span><div><b>Choose the hair</b><small>The face and body stay locked</small></div></div>
-          <div className="hairGrid">
-            {HAIRS.map(([id, name, vibe], index) => (
-              <button key={id} className={hair === id ? "selected" : ""} onClick={() => setHair(id)}>
-                <span className="hairCrop" style={{ backgroundPosition: `${(index % 3) * 50}% ${index < 3 ? "0%" : "100%"}` }} />
-                <b>{id} · {name}</b><small>{vibe}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="step"><span>3</span><div><b>Direct the vibe</b><small>Background, lighting and pose work together</small></div></div>
-          <div className="directionFields">
-            <label><span>Product type</span><select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Product category">{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label><span>Visual vibe</span><select value={vibe} onChange={(event) => setVibe(event.target.value as keyof typeof VIBES)} aria-label="Visual vibe">{Object.keys(VIBES).map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label><span>Đà Nẵng scene</span><select value={scene} onChange={(event) => setScene(event.target.value as keyof typeof DANANG_SCENES)} aria-label="Da Nang scene">{Object.keys(DANANG_SCENES).map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label><span>Character</span><select value={archetype} onChange={(event) => setArchetype(event.target.value as keyof typeof ARCHETYPES)} aria-label="Visual archetype">{Object.keys(ARCHETYPES).map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label><span>Composition</span><select value={composition} onChange={(event) => setComposition(event.target.value as keyof typeof COMPOSITIONS)} aria-label="Photo composition">{Object.keys(COMPOSITIONS).map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label><span>Gaze</span><select value={gaze} onChange={(event) => setGaze(event.target.value as keyof typeof GAZES)} aria-label="Gaze direction">{Object.keys(GAZES).map((item) => <option key={item}>{item}</option>)}</select></label>
-          </div>
-          <div className="poseLabel">Pose direction</div>
-          <div className="poseGrid">{Object.keys(POSES).map((item) => <button type="button" key={item} className={pose === item ? "selected" : ""} onClick={() => setPose(item as keyof typeof POSES)}>{item}</button>)}</div>
-          <div className="sceneBrief"><b>{archetype} · {scene} · {composition}</b><span>{GAZES[gaze]} {DANANG_SCENES[scene]} {COMPOSITIONS[composition]}</span></div>
-          <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Optional: pose, mood, or product detail to emphasize" maxLength={300} />
-
-          <button className="generate" onClick={prepareForChatGPT} disabled={status === "working"}>
-            {status === "working" ? "Preparing…" : "Share to ChatGPT"}<span>No API key</span>
-          </button>
-          {message && <p className={`message ${status === "error" ? "error" : ""}`}>{message}</p>}
         </div>
-
-        <div className="panel resultPanel">
-          <div className="resultTitle"><div><b>ChatGPT handoff</b><small>Model 01 · {hair} · 9:16</small></div><span className="statusDot">{prepared ? "Prepared" : "No API key"}</span></div>
-          <div className="handoff">
-            <div className="handoffFiles">
-              <span><img src="/model-01/turnaround.png" alt="Model turnaround attachment" /><b>Identity</b></span>
-              <span><img src="/model-01/hairstyles.png" alt="Hairstyle board attachment" /><b>Hair board</b></span>
-              <span className={preview ? "readyFile" : ""}>{preview ? <img src={preview} alt="Product attachment" /> : <i>＋</i>}<b>Product</b></span>
-            </div>
-            <div className="handoffSteps"><b>On your phone</b><span><i>1</i> Tap “Share to ChatGPT”</span><span><i>2</i> Choose ChatGPT in the share sheet</span><span><i>3</i> Paste the copied prompt and send</span></div>
-            <div className="promptPreview"><span>Prepared prompt — press and hold to copy manually</span><textarea readOnly value={prompt} aria-label="Prepared ChatGPT prompt" /></div>
-          </div>
-          <div className="actions"><button onClick={copyPrompt}>Copy prompt</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Open ChatGPT</a></div>
-          <div className="downloadRefs"><span>Blocked sharing?</span><a href="/model-01/turnaround.png" download>Download identity</a><a href="/model-01/hairstyles.png" download>Download hair board</a></div>
-          <div className="checklist"><b>Before posting</b><span>✓ Face consistency</span><span>✓ Product details</span><span>✓ Background fit</span><span>Remember TikTok’s AI-generated media label.</span></div>
-        </div>
-      </section>
-      <footer>No API key required. Your images are handed directly to the ChatGPT app through your device.</footer>
-    </main>
-  );
+        <div className="actions"><button onClick={copyOnly}>Chỉ sao chép prompt</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
+        <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.png" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.png" download>Tải bảng tóc</a></div>
+        <div className="checklist"><b>Kiểm tra trước khi đăng</b><span>✓ Khuôn mặt nhất quán</span><span>✓ Sản phẩm chính xác</span><span>✓ Bối cảnh có chiều sâu</span><span>Nhớ bật nhãn nội dung do AI tạo trên TikTok.</span></div>
+      </div>
+    </section>
+    <footer>Không cần API key. Ảnh sản phẩm được thêm trực tiếp trong ChatGPT.</footer>
+  </main>;
 }

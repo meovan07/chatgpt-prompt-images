@@ -12,13 +12,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") || (host.startsWith("localhost") ? "http" : "https");
   const image = `${protocol}://${host}/og.png`;
   return {
-    title: "Model Studio — TikTok Affiliate Creator",
-    description: "Create consistent TikTok affiliate product images with Model 01.",
-    openGraph: { title: "Model Studio", description: "One model. Every product.", images: [{ url: image, width: 1200, height: 630 }] },
-    twitter: { card: "summary_large_image", title: "Model Studio", description: "One model. Every product.", images: [image] },
+    title: "Studio Người Mẫu — Sáng tạo TikTok Affiliate",
+    description: "Xây dựng concept ảnh nhất quán với Model 01, không cần API key.",
+    openGraph: { title: "Studio Người Mẫu", description: "Một người mẫu. Mọi phong cách.", images: [{ url: image, width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", title: "Studio Người Mẫu", description: "Một người mẫu. Mọi phong cách.", images: [image] },
   };
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${geist.variable} ${mono.variable}`}>{children}</body></html>;
+  return <html lang="vi"><body className={`${geist.variable} ${mono.variable}`}>{children}</body></html>;
 }
