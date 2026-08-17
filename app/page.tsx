@@ -174,6 +174,7 @@ export default function Home() {
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
   const [dangXuLy, setDangXuLy] = useState(false);
+  const [daSaoChep, setDaSaoChep] = useState<"prompt"|"follow"|null>(null);
   const tocDaChon = TOC.find((item) => item[0] === toc);
 
   const prompt = useMemo(() => `Use the two attached Model 01 images as strict identity references. I will attach the product image separately in ChatGPT; treat the last product image as the exact product reference.
@@ -233,8 +234,9 @@ Preserve realistic optical background blur, subtle environmental motion blur, ac
     finally{setDangXuLy(false);}
   }
 
-  async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);setThongBao(ok?"Đã sao chép prompt. Hãy dán vào ChatGPT sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
-  async function copyFollowUp(){const ok=await saoChep(followUpPrompt);setThongBao(ok?"Đã sao chép prompt cho ảnh tiếp theo. Hãy dán vào đúng cuộc trò chuyện đã tạo ảnh đầu tiên.":"Hãy nhấn giữ prompt tiếp nối rồi chọn Tất cả → Sao chép.");}
+  function hienTrangThaiDaChep(loai: "prompt"|"follow") { setDaSaoChep(loai); navigator.vibrate?.(35); window.setTimeout(()=>setDaSaoChep(current=>current===loai?null:current),2400); }
+  async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);if(ok)hienTrangThaiDaChep("prompt");setThongBao(ok?"Prompt đã sẵn sàng — mở ChatGPT và dán sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
+  async function copyFollowUp(){const ok=await saoChep(followUpPrompt);if(ok)hienTrangThaiDaChep("follow");setThongBao(ok?"Prompt ảnh tiếp theo đã sẵn sàng — dán vào đúng cuộc trò chuyện đang dùng.":"Hãy nhấn giữ prompt tiếp nối rồi chọn Tất cả → Sao chép.");}
 
   const Select = ({label,value,onChange,items}:{label:string;value:string;onChange:(v:string)=>void;items:string[]}) => <label><span>{label}</span><select value={value} onChange={(e)=>onChange(e.target.value)}>{items.map(i=><option key={i}>{i}</option>)}</select></label>;
 
@@ -265,7 +267,7 @@ Preserve realistic optical background blur, subtle environmental motion blur, ac
         <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{doiThuong}: thêm người, xe cộ và những chi tiết đời thường có kiểm soát. {TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
         <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
         <button className="generate" onClick={chiaSe} disabled={dangXuLy}>{dangXuLy?"Đang chuẩn bị…":"Chia sẻ sang ChatGPT"}<span>Không cần API key</span></button>
-        {thongBao&&<p className="message">{thongBao}</p>}
+        {thongBao&&<p className="message" role="status" aria-live="polite">{thongBao}</p>}
       </div>
       <div className="panel resultPanel">
         <div className="resultTitle"><div><b>Chuyển sang ChatGPT</b><small>Model 01 · {toc} · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã chuẩn bị":"2 ảnh tham chiếu"}</span></div>
@@ -280,10 +282,10 @@ Preserve realistic optical background blur, subtle environmental motion blur, ac
             <Select label="Chuyển động & gió" value={chuyenDongTiep} onChange={v=>setChuyenDongTiep(v as keyof typeof CHUYEN_DONG_TIEP)} items={Object.keys(CHUYEN_DONG_TIEP)}/>
             <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
             <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
-            <button className="copyFollow" onClick={copyFollowUp}>Sao chép prompt ảnh tiếp theo</button>
+            <button className={`copyFollow ${daSaoChep==="follow"?"copied":""}`} onClick={copyFollowUp} disabled={daSaoChep==="follow"} aria-label={daSaoChep==="follow"?"Đã sao chép prompt ảnh tiếp theo":"Sao chép prompt ảnh tiếp theo"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="follow"?"✓":"⧉"}</span><span>{daSaoChep==="follow"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt ảnh tiếp theo"}</span></button>
           </div>
         </div>
-        <div className="actions"><button onClick={copyOnly}>Chỉ sao chép prompt</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
+        <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
         <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.png" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.png" download>Tải bảng tóc</a></div>
         <div className="checklist"><b>Kiểm tra trước khi đăng</b><span>✓ Khuôn mặt nhất quán</span><span>✓ Sản phẩm chính xác</span><span>✓ Bối cảnh có chiều sâu</span><span>Nhớ bật nhãn nội dung do AI tạo trên TikTok.</span></div>
       </div>
