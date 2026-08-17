@@ -88,6 +88,13 @@ const XOA_PHONG = {
   "Nét sâu tự nhiên": "Use deeper natural focus for landscape or architectural context, while preserving tonal separation around the model.",
 } as const;
 
+const DO_DOI_THUONG = {
+  "Nhẹ · Tinh tế": "Add a few believable background details: one or two casually dressed people, a parked scooter, used café tables, slightly uneven plants and subtle surface wear. Keep them secondary and softly out of focus.",
+  "Vừa · Tự nhiên": "Make the location feel actively lived-in: several background patrons or pedestrians, occasional scooters or traffic, imperfect table placement, half-used cups, small reflections, signage shapes without readable text, and mild motion blur. Avoid symmetry and staged spacing.",
+  "Nhiều · Đường phố": "Use authentic Da Nang street or café activity with layered pedestrians, scooters, passing traffic, mixed practical lights, casual clutter and motion blur; maintain a clean visual pocket around the model and product.",
+  "Yên tĩnh · Có dấu vết": "No prominent crowd, but show human presence through pushed-back chairs, a jacket on a seat, used cups, footprints, parked bikes, imperfect foliage and weathered surfaces.",
+} as const;
+
 const ANH_TIEP_THEO = {
   "Ảnh 2 · Toàn cảnh": "Create a wider establishing shot that clearly shows the full environment and full-body styling.",
   "Ảnh 3 · Trung cảnh": "Create a medium three-quarter shot with a new natural action and stronger product visibility.",
@@ -120,6 +127,7 @@ export default function Home() {
   const [phuKien, setPhuKien] = useState<keyof typeof PHU_KIEN>("Tối giản tự động");
   const [anhSang, setAnhSang] = useState<keyof typeof ANH_SANG>("Ánh sáng café cửa sổ");
   const [xoaPhong, setXoaPhong] = useState<keyof typeof XOA_PHONG>("Bokeh tự nhiên");
+  const [doiThuong, setDoiThuong] = useState<keyof typeof DO_DOI_THUONG>("Vừa · Tự nhiên");
   const [anhTiepTheo, setAnhTiepTheo] = useState<keyof typeof ANH_TIEP_THEO>("Ảnh 2 · Toàn cảnh");
   const [ghiChu, setGhiChu] = useState("");
   const [daChuanBi, setDaChuanBi] = useState(false);
@@ -142,16 +150,21 @@ Makeup: ${EN[trangDiem]}; preserve facial identity and real skin texture.
 Accessories: ${EN[phuKien]}.
 Lighting: ${EN[anhSang]}.
 Depth of field: ${XOA_PHONG[xoaPhong]}
+Environmental realism: ${DO_DOI_THUONG[doiThuong]}
 
-Unify the location, palette, lighting, hair movement, expression, accessories, camera angle and pose into one coherent campaign concept. Use complementary color or tonal contrast so the product separates clearly. Keep the background realistic, dimensional and secondary. The model should feel observed in an authentic moment, never posed directly at the viewer. ${ghiChu ? `Additional direction: ${ghiChu}.` : "Prioritize a lively, tasteful and believable moment over a rigid catalog pose."}
+Unify the location, palette, lighting, hair movement, expression, accessories, camera angle and pose into one coherent campaign concept. Use complementary color or tonal contrast so the product separates clearly. Keep the background realistic, dimensional and secondary. The model should feel observed in an authentic moment, never posed directly at the viewer.
 
-Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, ghiChu, khongGian, loai, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
+ANTI-PERFECTION REALISM: Do not create an empty, spotless, perfectly symmetrical or showroom-like environment. Include ordinary human traces and small visual irregularities appropriate to Da Nang: background people in varied casual poses, scooters or traffic where plausible, slightly crooked chairs, used tables, uneven foliage, minor pavement or wall wear, mixed color temperatures, small reflections and partial occlusions. Background people must look like distinct real individuals rather than duplicated extras. Keep their faces non-prominent and naturally blurred by distance, lens depth or motion. Do not let anyone stare at the camera or compete with the model. Preserve a clean separation zone immediately around the product.
+
+Allow subtle photographic imperfections: gentle sensor grain, slightly imperfect framing, natural highlight roll-off, tiny exposure variation and realistic motion blur on moving background elements. Do not add fake film damage, excessive noise, warped vehicles, duplicate pedestrians or illegible text as a focal point. ${ghiChu ? `Additional direction: ${ghiChu}.` : "Prioritize a lively, tasteful and believable moment over a rigid catalog pose."}
+
+Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, doiThuong, ghiChu, khongGian, loai, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
 
   const followUpPrompt = useMemo(() => `Continue the same five-image campaign using the already established Model 01 identity, exact product, Da Nang location, styling, makeup, accessories, lighting, color grade and depth-of-field treatment.
 
 ${ANH_TIEP_THEO[anhTiepTheo]}
 
-Keep the exact same woman and product. Do not redesign the outfit or product. Maintain continuity in time of day, weather, background architecture, props and color palette. Change only the camera distance, angle, natural action and composition so the sequence gives TikTok AutoCut useful visual variety. Preserve realistic optical background blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo]);
+Keep the exact same woman and product. Do not redesign the outfit or product. Maintain continuity in time of day, weather, background architecture, props, ordinary human activity and color palette. Background extras and traffic should evolve naturally between frames rather than freeze or repeat; never duplicate faces, vehicles or poses. Change only the camera distance, angle, natural action and composition so the sequence gives TikTok AutoCut useful visual variety. Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo]);
 
   async function layTep(path: string, name: string) { const blob = await (await fetch(path)).blob(); return new File([blob], name, { type: blob.type || "image/png" }); }
   async function saoChep(text: string) { try { await navigator.clipboard.writeText(text); return true; } catch { const x=document.createElement("textarea"); x.value=text; x.readOnly=true; x.style.position="fixed"; x.style.opacity="0"; document.body.appendChild(x); x.select(); const ok=document.execCommand("copy"); x.remove(); return ok; } }
@@ -198,8 +211,9 @@ Keep the exact same woman and product. Do not redesign the outfit or product. Ma
           <Select label="Phụ kiện" value={phuKien} onChange={v=>setPhuKien(v as keyof typeof PHU_KIEN)} items={Object.keys(PHU_KIEN)}/>
           <Select label="Ánh sáng" value={anhSang} onChange={v=>setAnhSang(v as keyof typeof ANH_SANG)} items={Object.keys(ANH_SANG)}/>
           <Select label="Độ mờ hậu cảnh" value={xoaPhong} onChange={v=>setXoaPhong(v as keyof typeof XOA_PHONG)} items={Object.keys(XOA_PHONG)}/>
+          <Select label="Độ đời thường" value={doiThuong} onChange={v=>setDoiThuong(v as keyof typeof DO_DOI_THUONG)} items={Object.keys(DO_DOI_THUONG)}/>
         </div>
-        <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
+        <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{doiThuong}: thêm người, xe cộ và những chi tiết đời thường có kiểm soát. {TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
         <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
         <button className="generate" onClick={chiaSe} disabled={dangXuLy}>{dangXuLy?"Đang chuẩn bị…":"Chia sẻ sang ChatGPT"}<span>Không cần API key</span></button>
         {thongBao&&<p className="message">{thongBao}</p>}
