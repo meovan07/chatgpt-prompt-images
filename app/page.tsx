@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const HAIRS = [
   ["H01", "Sleek straight", "Clean & minimal"],
@@ -22,6 +22,8 @@ export default function Home() {
   const [result, setResult] = useState("");
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
   const [message, setMessage] = useState("");
+  const libraryInput = useRef<HTMLInputElement>(null);
+  const cameraInput = useRef<HTMLInputElement>(null);
 
   const selectedHair = useMemo(() => HAIRS.find((item) => item[0] === hair), [hair]);
 
@@ -100,11 +102,16 @@ export default function Home() {
       <section className="workspace">
         <div className="panel controls">
           <div className="step"><span>1</span><div><b>Add the product</b><small>Use a clear front-facing image</small></div></div>
-          <label className={`dropzone ${preview ? "hasImage" : ""}`}>
+          <div className={`dropzone ${preview ? "hasImage" : ""}`}>
             {preview ? <img src={preview} alt="Selected product" /> : <><strong>＋</strong><b>Choose product image</b><small>JPG, PNG or WebP</small></>}
-            <input type="file" accept="image/*" capture="environment" onChange={(event) => chooseProduct(event.target.files?.[0])} />
-            {preview && <span className="replace">Replace</span>}
-          </label>
+            {preview && <span className="replace">Ready to use</span>}
+          </div>
+          <div className="sourceButtons">
+            <button type="button" onClick={() => libraryInput.current?.click()}><b>Photo library / Files</b><span>Choose an image on this device</span></button>
+            <button type="button" onClick={() => cameraInput.current?.click()}><b>Take a photo</b><span>Use the rear camera</span></button>
+          </div>
+          <input ref={libraryInput} className="hiddenFile" type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" onChange={(event) => chooseProduct(event.target.files?.[0])} />
+          <input ref={cameraInput} className="hiddenFile" type="file" accept="image/*" capture="environment" onChange={(event) => chooseProduct(event.target.files?.[0])} />
 
           <div className="step"><span>2</span><div><b>Choose the hair</b><small>The face and body stay locked</small></div></div>
           <div className="hairGrid">
