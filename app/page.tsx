@@ -11,13 +11,34 @@ const HAIRS = [
   ["H06", "Low bun", "Polished"],
 ] as const;
 
-const BACKGROUNDS = ["Auto match product", "Minimal studio", "Modern café", "Clean bedroom", "City street", "Warm home"];
+const CATEGORIES = ["Fashion / clothing", "Beauty / skincare", "Bag / accessories", "Shoes", "Home / lifestyle", "Fitness"];
+
+const VIBES = {
+  "Auto style director": "Study the product's color, material, price positioning, and intended customer. Select a coherent location, palette, lighting, styling, and camera treatment that make the product feel desirable without competing with it.",
+  "Soft feminine": "Airy editorial setting in blush, cream, or warm neutral tones; delicate daylight; subtle floral or fabric texture; romantic but uncluttered; soft highlights and graceful movement.",
+  "Clean luxury": "Quiet-luxury interior or refined minimal studio; stone, warm ivory, walnut, or brushed metal accents; controlled directional light; premium editorial composition with generous negative space.",
+  "Korean casual": "Bright modern Seoul-inspired café, apartment, or clean street; milky daylight; pale wood and soft neutral palette; candid youthful styling with a polished smartphone-photo finish.",
+  "Urban street": "Contemporary city architecture, clean concrete and glass, directional late-afternoon light; confident editorial framing; energetic but the background remains softly separated from the product.",
+  "Cozy lifestyle": "Warm lived-in home with natural wood, linen, and soft window light; authentic everyday moment; comfortable and approachable, with carefully controlled clutter.",
+  "Active energy": "Bright fitness studio or clean outdoor active setting; crisp daylight, fresh color accents, dynamic composition, and believable movement without motion blur on the product.",
+} as const;
+
+const POSES = {
+  "Auto match vibe": "Choose a natural, commercially effective pose that fits the product and selected vibe. The pose must reveal the product clearly and avoid covering important details.",
+  "Walking candid": "Mid-step candid walk, relaxed shoulders, natural arm swing, subtle gaze away from camera; garment and hair show gentle believable movement.",
+  "Confident editorial": "Balanced contrapposto stance, one leg slightly forward, elongated posture, confident direct gaze, one hand relaxed while the other interacts naturally with the product.",
+  "Soft graceful": "Gentle three-quarter body angle, relaxed wrists, slight head tilt, calm expression, elegant S-curve without exaggerated anatomy.",
+  "Product close-up": "Three-quarter crop with the product closest to camera, held or worn naturally; face remains visible while product construction and texture are the visual priority.",
+  "Everyday action": "A believable use moment appropriate to the product—adjusting a strap, smoothing fabric, applying or holding the item—captured between poses rather than staged.",
+} as const;
 
 export default function Home() {
   const [product, setProduct] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [hair, setHair] = useState("H02");
-  const [background, setBackground] = useState(BACKGROUNDS[0]);
+  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [vibe, setVibe] = useState<keyof typeof VIBES>("Auto style director");
+  const [pose, setPose] = useState<keyof typeof POSES>("Auto match vibe");
   const [note, setNote] = useState("");
   const [prepared, setPrepared] = useState(false);
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
@@ -46,9 +67,15 @@ Create the same adult woman wearing or using the product. Preserve her facial ge
 
 Preserve the product's exact color, material, construction, proportions, print, and logo placement. Keep it unobstructed and visually prominent.
 
-Background: ${background}. ${note ? `Additional direction: ${note}.` : "Choose lighting and colors that complement the product."}
+Product category: ${category}.
 
-Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natural anatomy and hands. No text, watermark, interface elements, or additional products.`, [background, hair, note, selectedHair]);
+Creative direction — ${vibe}: ${VIBES[vibe]}
+
+Pose direction — ${pose}: ${POSES[pose]}
+
+Make the environment, lighting, hair movement, expression, camera height, lens perspective, and pose feel like one coherent campaign. Match background colors to the product using complementary or tonal contrast; do not place a product against a similar-value background where its silhouette disappears. Keep background detail secondary with realistic depth separation. ${note ? `Additional direction: ${note}.` : "Prioritize an authentic, aspirational lifestyle moment rather than a rigid catalog pose."}
+
+Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Use an eye-level or slightly low camera angle that flatters the product. Natural anatomy and hands. No text, watermark, interface elements, or additional products.`, [category, hair, note, pose, selectedHair, vibe]);
 
   async function assetFile(path: string, name: string) {
     const blob = await (await fetch(path)).blob();
@@ -169,10 +196,14 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Natu
             ))}
           </div>
 
-          <div className="step"><span>3</span><div><b>Set the scene</b><small>Auto match is recommended</small></div></div>
-          <select value={background} onChange={(event) => setBackground(event.target.value)} aria-label="Background style">
-            {BACKGROUNDS.map((item) => <option key={item}>{item}</option>)}
-          </select>
+          <div className="step"><span>3</span><div><b>Direct the vibe</b><small>Background, lighting and pose work together</small></div></div>
+          <div className="directionFields">
+            <label><span>Product type</span><select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Product category">{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Visual vibe</span><select value={vibe} onChange={(event) => setVibe(event.target.value as keyof typeof VIBES)} aria-label="Visual vibe">{Object.keys(VIBES).map((item) => <option key={item}>{item}</option>)}</select></label>
+          </div>
+          <div className="poseLabel">Pose direction</div>
+          <div className="poseGrid">{Object.keys(POSES).map((item) => <button type="button" key={item} className={pose === item ? "selected" : ""} onClick={() => setPose(item as keyof typeof POSES)}>{item}</button>)}</div>
+          <div className="sceneBrief"><b>{vibe} × {pose}</b><span>{VIBES[vibe]} {POSES[pose]}</span></div>
           <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Optional: pose, mood, or product detail to emphasize" maxLength={300} />
 
           <button className="generate" onClick={prepareForChatGPT} disabled={status === "working"}>
