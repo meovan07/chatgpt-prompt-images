@@ -32,6 +32,41 @@ const POSES = {
   "Everyday action": "A believable use moment appropriate to the product—adjusting a strap, smoothing fabric, applying or holding the item—captured between poses rather than staged.",
 } as const;
 
+const DANANG_SCENES = {
+  "Auto Đà Nẵng": "Choose an authentic Đà Nẵng setting that best supports the product and selected archetype; recognizable local atmosphere without turning the image into a tourist postcard.",
+  "Coastal café": "A refined open-air café near the Đà Nẵng coast, pale stone, light wood, linen seating, sea breeze and soft ocean light; tasteful tiểu cảnh with tropical greenery and ceramic details.",
+  "Garden café": "A photogenic Đà Nẵng garden café with layered tropical plants, dappled daylight, textured plaster, stone path and a curated tiểu cảnh; calm, intimate and believable.",
+  "Sơn Trà overlook": "A scenic Sơn Trà hillside viewpoint with layered green landscape and distant blue sea, soft atmospheric depth, natural breeze and elegant golden-hour light.",
+  "Mỹ Khê morning": "Mỹ Khê beach in gentle early-morning light, clean sand, pale blue water and airy sky; minimal people, refined coastal editorial mood, not a tourist snapshot.",
+  "Hàn River evening": "Modern riverside Đà Nẵng ambience near the Hàn River at blue hour, subtle city bokeh and reflections, premium urban mood without fake readable signage.",
+  "Old-town inspired": "A quiet central-Vietnam lane or courtyard with warm ochre walls, weathered wood, bougainvillea and handcrafted details; poetic rather than theme-park styling.",
+} as const;
+
+const ARCHETYPES = {
+  "Nàng thơ": "Poetic muse energy: dreamy, gentle, introspective and effortless; delicate movement, soft natural expression, airy fabric and a quietly cinematic moment.",
+  "Tổng tài": "Modern executive energy: composed, powerful and premium; clean silhouette, decisive posture, restrained expression, architectural background and quiet-luxury styling.",
+  "Tiểu thư": "Refined feminine elegance: polished, graceful and slightly playful; tasteful details, pristine styling, gentle confidence and upscale café or garden atmosphere.",
+  "Cô gái phố biển": "Fresh coastal-city energy: relaxed, sunlit and approachable; natural breeze, candid motion and contemporary Đà Nẵng lifestyle styling.",
+  "Minimal editorial": "Fashion-magazine restraint: sculptural pose, clean lines, strong negative space and an understated premium mood.",
+} as const;
+
+const COMPOSITIONS = {
+  "Rule of thirds": "Place the model on a vertical third with gaze or movement directed into open space; keep the product near an intersection point.",
+  "Golden ratio": "Arrange the visual flow along a subtle golden spiral, leading from environment to face and finally to the product as the focal point.",
+  "Leading lines": "Use architecture, a café counter, path, shoreline or railing as leading lines toward the model and product.",
+  "Frame within frame": "Use a doorway, window, foliage, arch or curated tiểu cảnh to frame the model naturally without obstructing the product.",
+  "Negative space": "Use generous clean space and asymmetric editorial balance; preserve a strong silhouette and uncluttered product readability.",
+  "Layered depth": "Use a soft foreground element, sharp subject plane and atmospheric background to create cinematic depth and an observational feeling.",
+} as const;
+
+const GAZES = {
+  "Natural look away": "Do not look into the camera. Gaze softly toward the environment or product, as if caught in a genuine unposed moment.",
+  "Admire product": "Look naturally at the product or the hand interacting with it, with a subtle pleased expression rather than a sales pose.",
+  "Profile distance": "Turn the face into a clean three-quarter or side profile and look into the distance; preserve recognizable facial identity.",
+  "Eyes lowered": "Use a gentle downward gaze with relaxed eyelids and an introspective expression; avoid appearing sad or sleepy.",
+  "Candid interaction": "Focus attention on a natural action in the scene—walking, adjusting hair, touching a cup, or using the product—with no awareness of the camera.",
+} as const;
+
 export default function Home() {
   const [product, setProduct] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
@@ -39,6 +74,10 @@ export default function Home() {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [vibe, setVibe] = useState<keyof typeof VIBES>("Auto style director");
   const [pose, setPose] = useState<keyof typeof POSES>("Auto match vibe");
+  const [scene, setScene] = useState<keyof typeof DANANG_SCENES>("Auto Đà Nẵng");
+  const [archetype, setArchetype] = useState<keyof typeof ARCHETYPES>("Nàng thơ");
+  const [composition, setComposition] = useState<keyof typeof COMPOSITIONS>("Rule of thirds");
+  const [gaze, setGaze] = useState<keyof typeof GAZES>("Natural look away");
   const [note, setNote] = useState("");
   const [prepared, setPrepared] = useState(false);
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
@@ -71,11 +110,19 @@ Product category: ${category}.
 
 Creative direction — ${vibe}: ${VIBES[vibe]}
 
+Đà Nẵng location — ${scene}: ${DANANG_SCENES[scene]}
+
+Visual archetype — ${archetype}: ${ARCHETYPES[archetype]}
+
 Pose direction — ${pose}: ${POSES[pose]}
+
+Gaze — ${gaze}: ${GAZES[gaze]}
+
+Photographic composition — ${composition}: ${COMPOSITIONS[composition]}
 
 Make the environment, lighting, hair movement, expression, camera height, lens perspective, and pose feel like one coherent campaign. Match background colors to the product using complementary or tonal contrast; do not place a product against a similar-value background where its silhouette disappears. Keep background detail secondary with realistic depth separation. ${note ? `Additional direction: ${note}.` : "Prioritize an authentic, aspirational lifestyle moment rather than a rigid catalog pose."}
 
-Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Use an eye-level or slightly low camera angle that flatters the product. Natural anatomy and hands. No text, watermark, interface elements, or additional products.`, [category, hair, note, pose, selectedHair, vibe]);
+Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Use an eye-level or slightly low camera angle that flatters the product. The model must feel observed rather than posing for the viewer; no direct eye contact unless explicitly requested in the additional direction. Natural anatomy and hands. No text, watermark, interface elements, or additional products.`, [archetype, category, composition, gaze, hair, note, pose, scene, selectedHair, vibe]);
 
   async function assetFile(path: string, name: string) {
     const blob = await (await fetch(path)).blob();
@@ -200,10 +247,14 @@ Generate one photorealistic vertical 9:16 TikTok affiliate lifestyle image. Use 
           <div className="directionFields">
             <label><span>Product type</span><select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Product category">{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
             <label><span>Visual vibe</span><select value={vibe} onChange={(event) => setVibe(event.target.value as keyof typeof VIBES)} aria-label="Visual vibe">{Object.keys(VIBES).map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Đà Nẵng scene</span><select value={scene} onChange={(event) => setScene(event.target.value as keyof typeof DANANG_SCENES)} aria-label="Da Nang scene">{Object.keys(DANANG_SCENES).map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Character</span><select value={archetype} onChange={(event) => setArchetype(event.target.value as keyof typeof ARCHETYPES)} aria-label="Visual archetype">{Object.keys(ARCHETYPES).map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Composition</span><select value={composition} onChange={(event) => setComposition(event.target.value as keyof typeof COMPOSITIONS)} aria-label="Photo composition">{Object.keys(COMPOSITIONS).map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Gaze</span><select value={gaze} onChange={(event) => setGaze(event.target.value as keyof typeof GAZES)} aria-label="Gaze direction">{Object.keys(GAZES).map((item) => <option key={item}>{item}</option>)}</select></label>
           </div>
           <div className="poseLabel">Pose direction</div>
           <div className="poseGrid">{Object.keys(POSES).map((item) => <button type="button" key={item} className={pose === item ? "selected" : ""} onClick={() => setPose(item as keyof typeof POSES)}>{item}</button>)}</div>
-          <div className="sceneBrief"><b>{vibe} × {pose}</b><span>{VIBES[vibe]} {POSES[pose]}</span></div>
+          <div className="sceneBrief"><b>{archetype} · {scene} · {composition}</b><span>{GAZES[gaze]} {DANANG_SCENES[scene]} {COMPOSITIONS[composition]}</span></div>
           <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Optional: pose, mood, or product detail to emphasize" maxLength={300} />
 
           <button className="generate" onClick={prepareForChatGPT} disabled={status === "working"}>
