@@ -174,7 +174,7 @@ export default function Home() {
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
   const [dangXuLy, setDangXuLy] = useState(false);
-  const [daSaoChep, setDaSaoChep] = useState<"prompt"|"follow"|null>(null);
+  const [daSaoChep, setDaSaoChep] = useState<"prompt"|"follow"|"caption"|null>(null);
   const tocDaChon = TOC.find((item) => item[0] === toc);
 
   const prompt = useMemo(() => `Use the two attached Model 01 images as strict identity references. I will attach the product image separately in ChatGPT; treat the last product image as the exact product reference.
@@ -216,6 +216,26 @@ Do NOT reuse the previous pose, gaze, facial expression, body direction, hand pl
 
 Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo, camXucTiep, chuyenDongTiep, doiCanhTiep, huongDangTiep]);
 
+  const captionPrompt = useMemo(() => `Based on the images and product already shared in this conversation, suggest 8 Vietnamese TikTok Affiliate captions for this post.
+
+Context:
+- Product category: ${loai}
+- Visual concept: ${nhanVat}
+- Location/vibe: ${khongGian}, Đà Nẵng
+- The video is a short AutoCut lifestyle sequence using multiple candid images.
+
+Requirements:
+- Write natural contemporary Vietnamese suitable for a personal TikTok account, not a brand advertisement.
+- Make every option meaningfully different: relatable observation, playful reaction, mini story, aesthetic mood, curiosity hook, soft recommendation, short punchy line, and conversational question.
+- Keep each caption concise: ideally 1–2 short sentences before hashtags.
+- Use a soft, believable call-to-action such as checking the product link or giỏ hàng; do not sound pushy.
+- Do not invent price, discount, material, sizing, performance, medical or beauty claims that are not visible or confirmed.
+- Avoid exaggerated phrases such as “must buy,” “best ever,” guaranteed results, or fake urgency.
+- Include 3–5 relevant Vietnamese hashtags per option. Avoid stuffing generic viral hashtags.
+- Mention Đà Nẵng only when it fits naturally; do not make every caption location-based.
+- Emojis are optional and limited to 0–2 per caption.
+- Output Vietnamese only, numbered 1–8, ready to copy. Do not explain your choices.`, [khongGian, loai, nhanVat]);
+
   async function layTep(path: string, name: string) { const blob = await (await fetch(path)).blob(); return new File([blob], name, { type: blob.type || "image/png" }); }
   async function saoChep(text: string) { try { await navigator.clipboard.writeText(text); return true; } catch { const x=document.createElement("textarea"); x.value=text; x.readOnly=true; x.style.position="fixed"; x.style.opacity="0"; document.body.appendChild(x); x.select(); const ok=document.execCommand("copy"); x.remove(); return ok; } }
   function taiTep(file: File) { const a=document.createElement("a"); a.href=URL.createObjectURL(file); a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
@@ -234,9 +254,10 @@ Preserve realistic optical background blur, subtle environmental motion blur, ac
     finally{setDangXuLy(false);}
   }
 
-  function hienTrangThaiDaChep(loai: "prompt"|"follow") { setDaSaoChep(loai); navigator.vibrate?.(35); window.setTimeout(()=>setDaSaoChep(current=>current===loai?null:current),2400); }
+  function hienTrangThaiDaChep(loai: "prompt"|"follow"|"caption") { setDaSaoChep(loai); navigator.vibrate?.(35); window.setTimeout(()=>setDaSaoChep(current=>current===loai?null:current),2400); }
   async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);if(ok)hienTrangThaiDaChep("prompt");setThongBao(ok?"Prompt đã sẵn sàng — mở ChatGPT và dán sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
   async function copyFollowUp(){const ok=await saoChep(followUpPrompt);if(ok)hienTrangThaiDaChep("follow");setThongBao(ok?"Prompt ảnh tiếp theo đã sẵn sàng — dán vào đúng cuộc trò chuyện đang dùng.":"Hãy nhấn giữ prompt tiếp nối rồi chọn Tất cả → Sao chép.");}
+  async function copyCaption(){const ok=await saoChep(captionPrompt);if(ok)hienTrangThaiDaChep("caption");setThongBao(ok?"Prompt gợi ý caption đã sẵn sàng — dán vào cuộc trò chuyện sau khi tạo ảnh.":"Hãy nhấn giữ prompt caption rồi chọn Tất cả → Sao chép.");}
 
   const Select = ({label,value,onChange,items}:{label:string;value:string;onChange:(v:string)=>void;items:string[]}) => <label><span>{label}</span><select value={value} onChange={(e)=>onChange(e.target.value)}>{items.map(i=><option key={i}>{i}</option>)}</select></label>;
 
@@ -283,6 +304,11 @@ Preserve realistic optical background blur, subtle environmental motion blur, ac
             <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
             <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
             <button className={`copyFollow ${daSaoChep==="follow"?"copied":""}`} onClick={copyFollowUp} disabled={daSaoChep==="follow"} aria-label={daSaoChep==="follow"?"Đã sao chép prompt ảnh tiếp theo":"Sao chép prompt ảnh tiếp theo"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="follow"?"✓":"⧉"}</span><span>{daSaoChep==="follow"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt ảnh tiếp theo"}</span></button>
+          </div>
+          <div className="captionSection">
+            <div className="captionHeading"><div><b>Gợi ý caption TikTok</b><small>8 lựa chọn tiếng Việt · CTA nhẹ · hashtag vừa đủ</small></div><span>Cuối quy trình</span></div>
+            <div className="promptPreview"><span>CAPTION PROMPT — DÁN SAU KHI TẠO ẢNH</span><textarea readOnly value={captionPrompt} aria-label="Prompt gợi ý caption TikTok"/></div>
+            <button className={`copyFollow ${daSaoChep==="caption"?"copied":""}`} onClick={copyCaption} disabled={daSaoChep==="caption"} aria-label={daSaoChep==="caption"?"Đã sao chép prompt caption":"Sao chép prompt gợi ý caption"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="caption"?"✓":"⧉"}</span><span>{daSaoChep==="caption"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt gợi ý caption"}</span></button>
           </div>
         </div>
         <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
