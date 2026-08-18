@@ -309,6 +309,13 @@ Requirements:
   async function copyCaption(){const ok=await saoChep(captionPrompt);if(ok)hienTrangThaiDaChep("caption");setThongBao(ok?"Prompt gợi ý caption đã sẵn sàng — dán vào cuộc trò chuyện sau khi tạo ảnh.":"Hãy nhấn giữ prompt caption rồi chọn Tất cả → Sao chép.");}
 
   const Select = ({label,value,onChange,items}:{label:string;value:string;onChange:(v:string)=>void;items:string[]}) => <label><span>{label}</span><select value={value} onChange={(e)=>onChange(e.target.value)}>{items.map(i=><option key={i}>{i}</option>)}</select></label>;
+  const PromptBox = ({label,value,kind,onCopy,ariaLabel}:{label:string;value:string;kind:"prompt"|"follow"|"caption";onCopy:()=>void;ariaLabel:string}) => {
+    const copied=daSaoChep===kind;
+    return <div className={`promptPreview ${copied?"isCopied":""}`}>
+      <div className="promptHeader"><span>{label}</span><button className="inlineCopy" onClick={onCopy} disabled={copied} aria-label={copied?"Đã sao chép":ariaLabel} title={copied?"Đã sao chép":ariaLabel}><span aria-hidden="true">{copied?"✓":"⧉"}</span><b>{copied?"Đã chép":"Sao chép"}</b></button></div>
+      <textarea readOnly value={value} aria-label={ariaLabel}/>
+    </div>;
+  };
 
   return <main>
     <header className="topbar"><div className="brand"><span className="brandMark">M1</span><span>Studio Người Mẫu</span></div><div className="secure"><span/> Không gian riêng tư</div></header>
@@ -346,7 +353,7 @@ Requirements:
         <div className="handoff">
           <div className="handoffFiles"><span><img src="/model-01/turnaround.webp" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.webp" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
           <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Bấm “Chia sẻ sang ChatGPT”</span><span><i>2</i> Thêm ảnh sản phẩm trực tiếp trong ChatGPT</span><span><i>3</i> Dán prompt đã sao chép và gửi</span></div>
-          <div className="promptPreview"><span>PROMPT ĐÃ SOẠN — NHẤN GIỮ ĐỂ SAO CHÉP</span><textarea readOnly value={prompt} aria-label="Prompt tạo ảnh bằng ChatGPT"/></div>
+          <PromptBox label="PROMPT ĐÃ SOẠN" value={prompt} kind="prompt" onCopy={copyOnly} ariaLabel="Sao chép prompt tạo ảnh bằng ChatGPT"/>
           <div className="continuation">
             <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
             <Select label="Cảm xúc mới" value={camXucTiep} onChange={v=>setCamXucTiep(v as keyof typeof CAM_XUC_TIEP)} items={Object.keys(CAM_XUC_TIEP)}/>
@@ -354,12 +361,12 @@ Requirements:
             <Select label="Góc máy bắt buộc" value={gocMayTiep} onChange={v=>setGocMayTiep(v as keyof typeof GOC_MAY_TIEP)} items={Object.keys(GOC_MAY_TIEP)}/>
             <Select label="Chuyển động & gió" value={chuyenDongTiep} onChange={v=>setChuyenDongTiep(v as keyof typeof CHUYEN_DONG_TIEP)} items={Object.keys(CHUYEN_DONG_TIEP)}/>
             <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
-            <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
+            <PromptBox label="FOLLOW-UP PROMPT · GIỮ NGUYÊN CONCEPT" value={followUpPrompt} kind="follow" onCopy={copyFollowUp} ariaLabel="Sao chép prompt tạo ảnh tiếp theo"/>
             <button className={`copyFollow ${daSaoChep==="follow"?"copied":""}`} onClick={copyFollowUp} disabled={daSaoChep==="follow"} aria-label={daSaoChep==="follow"?"Đã sao chép prompt ảnh tiếp theo":"Sao chép prompt ảnh tiếp theo"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="follow"?"✓":"⧉"}</span><span>{daSaoChep==="follow"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt ảnh tiếp theo"}</span></button>
           </div>
           <div className="captionSection">
             <div className="captionHeading"><div><b>Gợi ý caption TikTok</b><small>8 lựa chọn tiếng Việt · CTA nhẹ · hashtag vừa đủ</small></div><span>Cuối quy trình</span></div>
-            <div className="promptPreview"><span>CAPTION PROMPT — DÁN SAU KHI TẠO ẢNH</span><textarea readOnly value={captionPrompt} aria-label="Prompt gợi ý caption TikTok"/></div>
+            <PromptBox label="CAPTION PROMPT · DÁN SAU KHI TẠO ẢNH" value={captionPrompt} kind="caption" onCopy={copyCaption} ariaLabel="Sao chép prompt gợi ý caption TikTok"/>
             <button className={`copyFollow ${daSaoChep==="caption"?"copied":""}`} onClick={copyCaption} disabled={daSaoChep==="caption"} aria-label={daSaoChep==="caption"?"Đã sao chép prompt caption":"Sao chép prompt gợi ý caption"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="caption"?"✓":"⧉"}</span><span>{daSaoChep==="caption"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt gợi ý caption"}</span></button>
           </div>
         </div>
