@@ -205,7 +205,6 @@ export default function Home() {
   const [ghiChu, setGhiChu] = useState("");
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
-  const [dangXuLy, setDangXuLy] = useState(false);
   const [daSaoChep, setDaSaoChep] = useState<"prompt"|"follow"|"caption"|null>(null);
   const tocDaChon = TOC.find((item) => item[0] === toc);
 
@@ -285,23 +284,7 @@ Requirements:
 - Emojis are optional and limited to 0–2 per caption.
 - Output Vietnamese only, numbered 1–8, ready to copy. Do not explain your choices.`, [khongGian, loai, nhanVat]);
 
-  async function layTep(path: string, name: string) { const blob = await (await fetch(path)).blob(); return new File([blob], name, { type: blob.type || "image/png" }); }
   async function saoChep(text: string) { try { await navigator.clipboard.writeText(text); return true; } catch { const x=document.createElement("textarea"); x.value=text; x.readOnly=true; x.style.position="fixed"; x.style.opacity="0"; document.body.appendChild(x); x.select(); const ok=document.execCommand("copy"); x.remove(); return ok; } }
-  function taiTep(file: File) { const a=document.createElement("a"); a.href=URL.createObjectURL(file); a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
-
-  async function chiaSe() {
-    setDangXuLy(true); setThongBao("Đang chuẩn bị concept và ảnh tham chiếu…");
-    try {
-      const copied=await saoChep(prompt);
-      const files=[await layTep("/model-01/turnaround.webp","model-01-goc-nhin.webp"),await layTep("/model-01/hairstyles.webp","model-01-kieu-toc.webp")];
-      setDaChuanBi(true);
-      if(navigator.share&&navigator.canShare?.({files})){
-        try{setThongBao(`${copied?"Đã sao chép prompt. ":"Prompt ở bên dưới. "}Hãy chọn ChatGPT, sau đó thêm ảnh sản phẩm.`);await navigator.share({files,title:"Tham chiếu Model 01"});}
-        catch(e){if(e instanceof DOMException&&e.name==="AbortError"){setThongBao("Đã hủy chia sẻ. Bạn có thể dùng các nút dự phòng bên dưới.");}else{files.forEach(taiTep);setThongBao("Trình duyệt chặn chia sẻ. Hai ảnh tham chiếu đã được tải xuống; hãy đính kèm chúng và ảnh sản phẩm trong ChatGPT.");}}
-      }else{files.forEach(taiTep);setThongBao(`${copied?"Đã sao chép prompt. ":"Hãy sao chép prompt bên dưới. "}Hai ảnh tham chiếu đã được tải xuống.`);}
-    }catch(e){setThongBao(e instanceof Error?e.message:"Không thể chuẩn bị nội dung.");}
-    finally{setDangXuLy(false);}
-  }
 
   function hienTrangThaiDaChep(loai: "prompt"|"follow"|"caption") { setDaSaoChep(loai); navigator.vibrate?.(35); window.setTimeout(()=>setDaSaoChep(current=>current===loai?null:current),2400); }
   async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);if(ok)hienTrangThaiDaChep("prompt");setThongBao(ok?"Prompt đã sẵn sàng — mở ChatGPT và dán sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
@@ -345,14 +328,12 @@ Requirements:
         </div>
         <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{doiThuong}: thêm người, xe cộ và những chi tiết đời thường có kiểm soát. {TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
         <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
-        <button className="generate" onClick={chiaSe} disabled={dangXuLy}>{dangXuLy?"Đang chuẩn bị…":"Chia sẻ sang ChatGPT"}<span>Không cần API key</span></button>
-        {thongBao&&<p className="message" role="status" aria-live="polite">{thongBao}</p>}
       </div>
       <div className="panel resultPanel">
         <div className="resultTitle"><div><b>Chuyển sang ChatGPT</b><small>Model 01 · {toc} · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã chuẩn bị":"2 ảnh tham chiếu"}</span></div>
         <div className="handoff">
           <div className="handoffFiles"><span><img src="/model-01/turnaround.webp" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.webp" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
-          <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Bấm “Chia sẻ sang ChatGPT”</span><span><i>2</i> Thêm ảnh sản phẩm trực tiếp trong ChatGPT</span><span><i>3</i> Dán prompt đã sao chép và gửi</span></div>
+          <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Sao chép prompt ngay trong khung bên dưới</span><span><i>2</i> Mở ChatGPT và thêm ảnh tham chiếu cùng ảnh sản phẩm</span><span><i>3</i> Dán prompt rồi gửi</span></div>
           <PromptBox label="PROMPT ĐÃ SOẠN" value={prompt} kind="prompt" onCopy={copyOnly} ariaLabel="Sao chép prompt tạo ảnh bằng ChatGPT"/>
           <div className="continuation">
             <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
@@ -371,6 +352,7 @@ Requirements:
           </div>
         </div>
         <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
+        {thongBao&&<p className="message" role="status" aria-live="polite">{thongBao}</p>}
         <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.webp" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.webp" download>Tải bảng tóc</a></div>
         <div className="checklist"><b>Kiểm tra trước khi đăng</b><span>✓ Khuôn mặt nhất quán</span><span>✓ Sản phẩm chính xác</span><span>✓ Bối cảnh có chiều sâu</span><span>Nhớ bật nhãn nội dung do AI tạo trên TikTok.</span></div>
       </div>
