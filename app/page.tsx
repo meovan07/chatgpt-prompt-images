@@ -139,6 +139,17 @@ const DOI_CANH_TIEP = {
   "Giữ nền, đổi hoạt động": "keep the recognizable background but let people, traffic, chairs, cups, shadows and movement progress naturally",
 } as const;
 
+const GOC_MAY_TIEP = {
+  "Quay vòng 45–90°": "orbit the camera 45–90 degrees around the model from the previous viewpoint, and also change either camera height or distance",
+  "Góc sau 3/4 thấp": "move behind the model to a low rear three-quarter viewpoint, clearly revealing the back silhouette and environmental depth",
+  "Ngang hông chính diện cạnh": "use a true side-profile viewpoint at approximately hip-to-chest camera height; do not show the same front three-quarter face angle",
+  "Góc cao rộng": "move noticeably higher and farther away for a wide downward environmental view with a smaller full-body figure",
+  "Góc thấp gần": "move lower and closer with a mild upward perspective; keep anatomy natural and avoid exaggerated wide-angle distortion",
+  "Qua vai / từ phía sau": "shoot over the model's shoulder or from directly behind, letting the scene ahead become part of the story",
+  "Cận lệch bên": "move close to one side for an asymmetric detail frame; crop differently and avoid the previous camera axis",
+  "Tự chọn khác biệt mạnh": "inspect the immediately previous image and choose a camera side, height, distance and lens perspective that are unmistakably different",
+} as const;
+
 const EN: Record<string,string> = {
   "Thời trang / quần áo":"fashion or clothing", "Mỹ phẩm / chăm sóc da":"beauty or skincare", "Túi / phụ kiện":"bag or accessory", "Giày dép":"footwear", "Đồ gia dụng / phong cách sống":"home or lifestyle product", "Thể thao":"fitness product",
   "Tự chọn tại Đà Nẵng":"an authentic Da Nang setting selected to suit the product, not a tourist postcard", "Café ven biển":"a refined open-air coastal café in Da Nang with pale stone, light wood, linen seating, sea breeze and tasteful tropical vignettes", "Café sân vườn":"a photogenic Da Nang garden café with layered tropical foliage, dappled daylight, textured plaster, stone paths and curated miniature landscaping", "Đồi Sơn Trà":"a Son Tra hillside overlook with layered greenery, distant blue sea, atmospheric depth and natural breeze", "Biển Mỹ Khê buổi sớm":"My Khe beach in soft early-morning light with clean sand, pale blue water, airy sky and minimal people", "Sông Hàn chiều tối":"the Han River waterfront at blue hour with subtle city bokeh and reflections", "Hẻm miền Trung":"a quiet Central Vietnamese lane or courtyard with warm ochre walls, weathered wood, bougainvillea and handcrafted details",
@@ -170,6 +181,7 @@ export default function Home() {
   const [huongDangTiep, setHuongDangTiep] = useState<keyof typeof HUONG_DANG_TIEP>("Tự chọn khác ảnh trước");
   const [chuyenDongTiep, setChuyenDongTiep] = useState<keyof typeof CHUYEN_DONG_TIEP>("Gió nhẹ");
   const [doiCanhTiep, setDoiCanhTiep] = useState<keyof typeof DOI_CANH_TIEP>("Đổi nhẹ cùng địa điểm");
+  const [gocMayTiep, setGocMayTiep] = useState<keyof typeof GOC_MAY_TIEP>("Quay vòng 45–90°");
   const [ghiChu, setGhiChu] = useState("");
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
@@ -209,12 +221,15 @@ FACIAL EMOTION: ${CAM_XUC_TIEP[camXucTiep]}.
 BODY DIRECTION AND ACTION: ${HUONG_DANG_TIEP[huongDangTiep]}.
 MOVEMENT: ${CHUYEN_DONG_TIEP[chuyenDongTiep]}.
 BACKGROUND EVOLUTION: ${DOI_CANH_TIEP[doiCanhTiep]}.
+MANDATORY CAMERA MOVE: ${GOC_MAY_TIEP[gocMayTiep]}.
 
 Keep the exact same woman and product. Do not redesign the outfit or product. Maintain the same overall time of day and coherent styling, while allowing a different light direction, weather nuance or nearby part of the location. It should feel like another moment from the same outing, not the exact same frozen minute. Let pedestrians, café patrons, traffic, waves, chairs, cups, foliage, shadows and small props change naturally.
 
-Do NOT reuse the previous pose, gaze, facial expression, body direction, hand placement, camera side, framing or exact background arrangement. This is a candid lifestyle sequence, not a set of formally composed hero images. Do not force rule of thirds, golden ratio, perfect symmetry or a polished catalog pose. Slightly imperfect framing, partial foreground occlusion, a tilted horizon within realistic limits, off-center cropping and spontaneous gestures are welcome when they make the moment feel human. Preserve product visibility appropriate to this shot; a back-facing beach view may prioritize showing the back construction of the garment.
+CAMERA DIVERSITY IS MANDATORY: first inspect the immediately previous generated image and identify its camera side, height, distance, subject scale and visible planes of the body. The new image must change at least three of those five attributes. Make the spatial move obvious enough that the two frames could not be mistaken for photographs taken from the same tripod position. A different pose alone does not count. Do not fall back to the common eye-level front three-quarter portrait. Do not mirror the old image or merely crop it tighter.
 
-Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo, camXucTiep, chuyenDongTiep, doiCanhTiep, huongDangTiep]);
+Do NOT reuse the previous pose, gaze, facial expression, body direction, hand placement, framing or exact background arrangement. This is a candid lifestyle sequence, not a set of formally composed hero images. Do not force rule of thirds, golden ratio, perfect symmetry or a polished catalog pose. Slightly imperfect framing, partial foreground occlusion, a tilted horizon within realistic limits, off-center cropping and spontaneous gestures are welcome when they make the moment feel human. Preserve product visibility appropriate to this shot; a back-facing beach view may prioritize showing the back construction of the garment.
+
+Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo, camXucTiep, chuyenDongTiep, doiCanhTiep, gocMayTiep, huongDangTiep]);
 
   const captionPrompt = useMemo(() => `Based on the images and product already shared in this conversation, suggest 8 Vietnamese TikTok Affiliate captions for this post.
 
@@ -300,6 +315,7 @@ Requirements:
             <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
             <Select label="Cảm xúc mới" value={camXucTiep} onChange={v=>setCamXucTiep(v as keyof typeof CAM_XUC_TIEP)} items={Object.keys(CAM_XUC_TIEP)}/>
             <Select label="Hướng người & hành động" value={huongDangTiep} onChange={v=>setHuongDangTiep(v as keyof typeof HUONG_DANG_TIEP)} items={Object.keys(HUONG_DANG_TIEP)}/>
+            <Select label="Góc máy bắt buộc" value={gocMayTiep} onChange={v=>setGocMayTiep(v as keyof typeof GOC_MAY_TIEP)} items={Object.keys(GOC_MAY_TIEP)}/>
             <Select label="Chuyển động & gió" value={chuyenDongTiep} onChange={v=>setChuyenDongTiep(v as keyof typeof CHUYEN_DONG_TIEP)} items={Object.keys(CHUYEN_DONG_TIEP)}/>
             <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
             <div className="promptPreview"><span>FOLLOW-UP PROMPT — GIỮ NGUYÊN CONCEPT</span><textarea readOnly value={followUpPrompt} aria-label="Prompt tạo ảnh tiếp theo"/></div>
