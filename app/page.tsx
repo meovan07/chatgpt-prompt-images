@@ -95,6 +95,15 @@ const DO_DOI_THUONG = {
   "Yên tĩnh · Có dấu vết": "No prominent crowd, but show human presence through pushed-back chairs, a jacket on a seat, used cups, footprints, parked bikes, imperfect foliage and weathered surfaces.",
 } as const;
 
+const MOC_THI_GIAC = {
+  "Chuyển động bất ngờ": "catch a visually immediate transition—mid-turn, first step, wind catching the garment or a spontaneous hand gesture—while keeping the product readable",
+  "Khoảnh khắc cảm xúc": "lead with a genuine micro-expression or spontaneous laugh that feels observed rather than performed",
+  "Tương phản cảnh & sản phẩm": "create a strong but natural tonal or color separation between the product and its surroundings without artificial spotlighting",
+  "Góc nhìn đời thường": "use an intimate observer viewpoint as if a friend noticed the moment, with believable foreground depth and imperfect framing",
+  "Chi tiết gây tò mò": "introduce one plausible foreground or environmental detail that creates curiosity without obscuring the product or becoming clickbait",
+  "Tự chọn theo sản phẩm": "choose one clear scroll-stopping visual idea appropriate to the product, setting and character; keep it authentic and achievable by a real camera",
+} as const;
+
 const ANH_TIEP_THEO = {
   "Ảnh 2 · Khoảnh khắc khác": "Create a clearly different candid moment from the first image, not a minor pose adjustment.",
   "Ảnh 3 · Đổi góc máy": "Move the camera to a distinctly different side, height and distance while keeping continuity.",
@@ -176,6 +185,7 @@ export default function Home() {
   const [anhSang, setAnhSang] = useState<keyof typeof ANH_SANG>("Ánh sáng café cửa sổ");
   const [xoaPhong, setXoaPhong] = useState<keyof typeof XOA_PHONG>("Bokeh tự nhiên");
   const [doiThuong, setDoiThuong] = useState<keyof typeof DO_DOI_THUONG>("Vừa · Tự nhiên");
+  const [mocThiGiac, setMocThiGiac] = useState<keyof typeof MOC_THI_GIAC>("Chuyển động bất ngờ");
   const [anhTiepTheo, setAnhTiepTheo] = useState<keyof typeof ANH_TIEP_THEO>("Ảnh 2 · Khoảnh khắc khác");
   const [camXucTiep, setCamXucTiep] = useState<keyof typeof CAM_XUC_TIEP>("Cười lớn che miệng");
   const [huongDangTiep, setHuongDangTiep] = useState<keyof typeof HUONG_DANG_TIEP>("Tự chọn khác ảnh trước");
@@ -205,14 +215,21 @@ Accessories: ${EN[phuKien]}.
 Lighting: ${EN[anhSang]}.
 Depth of field: ${XOA_PHONG[xoaPhong]}
 Environmental realism: ${DO_DOI_THUONG[doiThuong]}
+Viewer hook: ${MOC_THI_GIAC[mocThiGiac]}.
 
 Unify the location, palette, lighting, hair movement, expression, accessories, camera angle and pose into one coherent campaign concept. Use complementary color or tonal contrast so the product separates clearly. Keep the background realistic, dimensional and secondary. The model should feel observed in an authentic moment, never posed directly at the viewer.
 
 ANTI-PERFECTION REALISM: Do not create an empty, spotless, perfectly symmetrical or showroom-like environment. Include ordinary human traces and small visual irregularities appropriate to Da Nang: background people in varied casual poses, scooters or traffic where plausible, slightly crooked chairs, used tables, uneven foliage, minor pavement or wall wear, mixed color temperatures, small reflections and partial occlusions. Background people must look like distinct real individuals rather than duplicated extras. Keep their faces non-prominent and naturally blurred by distance, lens depth or motion. Do not let anyone stare at the camera or compete with the model. Preserve a clean separation zone immediately around the product.
 
-Allow subtle photographic imperfections: gentle sensor grain, slightly imperfect framing, natural highlight roll-off, tiny exposure variation and realistic motion blur on moving background elements. Do not add fake film damage, excessive noise, warped vehicles, duplicate pedestrians or illegible text as a focal point. ${ghiChu ? `Additional direction: ${ghiChu}.` : "Prioritize a lively, tasteful and believable moment over a rigid catalog pose."}
+HUMAN PHOTOGRAPHY REALISM: eliminate the common synthetic look. Skin must retain pores, fine facial hair, tiny tonal variation, faint under-eye and nasolabial texture, natural lip texture and realistic subsurface color—never plastic, waxy, airbrushed or uniformly smooth. Do not sharpen every eyelash or hair strand equally. Preserve small natural asymmetries in brows, smile, shoulders, wrists, stance and fabric tension without changing identity or creating defects.
 
-Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, doiThuong, ghiChu, khongGian, loai, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
+Lighting must be physically plausible but not studio-perfect: allow gentle falloff across the face and body, mixed ambient color, mild bounce from nearby surfaces, slightly uneven shadow density and occasional soft highlight clipping. Never use a uniform beauty glow, identical rim light around the whole silhouette, perfectly balanced bilateral lighting or a fake spotlight isolated from the environment.
+
+Composition must feel found, not mathematically arranged. Avoid centered symmetry, equal spacing, mirrored background objects, perfectly parallel limbs, repeated people or a spotless set. Permit off-center cropping, unequal negative space, partial foreground occlusion and natural visual weight. Keep the product legible through focus, timing and contrast—not by making the environment unnaturally empty.
+
+Allow subtle photographic imperfections: gentle sensor grain, slightly imperfect focus transition, natural highlight roll-off, tiny exposure variation, restrained chromatic softness near frame edges and realistic motion blur only on moving elements. Do not add fake film damage, excessive noise, warped vehicles, duplicate pedestrians or illegible text as a focal point. ${ghiChu ? `Additional direction: ${ghiChu}.` : "Prioritize a lively, tasteful and believable moment over a rigid catalog pose."}
+
+Generate IMAGE 1 OF 5: the campaign hero image. Create one photorealistic vertical 9:16 commercial lifestyle photograph for TikTok Affiliate. The first frame must communicate one clear visual hook within a second, while remaining candid rather than sensational. Use an eye-level or slightly low camera angle. Natural anatomy and hands. Preserve real skin texture. No text, watermark, interface elements, competing products or fake logos.`, [anhMat, anhSang, boCuc, dang, doiThuong, ghiChu, khongGian, loai, mocThiGiac, nhanVat, phuKien, toc, tocDaChon, trangDiem, xoaPhong]);
 
   const followUpPrompt = useMemo(() => `Continue the same five-image campaign using the already established Model 01 identity, exact product and overall Da Nang lifestyle concept. Preserve the overall time of day while allowing natural variation in light direction, shadows, cloud cover, exposure and atmosphere.
 
@@ -228,6 +245,8 @@ Keep the exact same woman and product. Do not redesign the outfit or product. Ma
 CAMERA DIVERSITY IS MANDATORY: first inspect the immediately previous generated image and identify its camera side, height, distance, subject scale and visible planes of the body. The new image must change at least three of those five attributes. Make the spatial move obvious enough that the two frames could not be mistaken for photographs taken from the same tripod position. A different pose alone does not count. Do not fall back to the common eye-level front three-quarter portrait. Do not mirror the old image or merely crop it tighter.
 
 Do NOT reuse the previous pose, gaze, facial expression, body direction, hand placement, framing or exact background arrangement. This is a candid lifestyle sequence, not a set of formally composed hero images. Do not force rule of thirds, golden ratio, perfect symmetry or a polished catalog pose. Slightly imperfect framing, partial foreground occlusion, a tilted horizon within realistic limits, off-center cropping and spontaneous gestures are welcome when they make the moment feel human. Preserve product visibility appropriate to this shot; a back-facing beach view may prioritize showing the back construction of the garment.
+
+Keep the same human-photography realism established in image 1: visible skin microtexture and tiny tonal variation, naturally unequal fabric folds and posture, physically consistent but slightly uneven ambient light, non-uniform focus, imperfect environmental spacing and asymmetrical visual weight. Never produce plastic skin, a universal beauty glow, identical rim lighting, mirrored objects, mathematically balanced framing or an unnaturally empty background. Give this frame its own immediate story beat rather than making a prettier duplicate.
 
 Preserve realistic optical background blur, subtle environmental motion blur, accurate anatomy, natural hands and real skin texture. Vertical 9:16. No text, watermark, interface elements, competing products or fake logos.`, [anhTiepTheo, camXucTiep, chuyenDongTiep, doiCanhTiep, gocMayTiep, huongDangTiep]);
 
@@ -299,6 +318,7 @@ Requirements:
           <Select label="Ánh sáng" value={anhSang} onChange={v=>setAnhSang(v as keyof typeof ANH_SANG)} items={Object.keys(ANH_SANG)}/>
           <Select label="Độ mờ hậu cảnh" value={xoaPhong} onChange={v=>setXoaPhong(v as keyof typeof XOA_PHONG)} items={Object.keys(XOA_PHONG)}/>
           <Select label="Độ đời thường" value={doiThuong} onChange={v=>setDoiThuong(v as keyof typeof DO_DOI_THUONG)} items={Object.keys(DO_DOI_THUONG)}/>
+          <Select label="Móc thị giác 1 giây đầu" value={mocThiGiac} onChange={v=>setMocThiGiac(v as keyof typeof MOC_THI_GIAC)} items={Object.keys(MOC_THI_GIAC)}/>
         </div>
         <div className="sceneBrief"><b>{nhanVat} · {khongGian} · {boCuc}</b><span>{doiThuong}: thêm người, xe cộ và những chi tiết đời thường có kiểm soát. {TRANG_DIEM[trangDiem]} {PHU_KIEN[phuKien]}</span></div>
         <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
