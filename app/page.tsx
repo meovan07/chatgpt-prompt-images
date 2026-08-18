@@ -206,6 +206,7 @@ export default function Home() {
   const [daChuanBi, setDaChuanBi] = useState(false);
   const [thongBao, setThongBao] = useState("");
   const [daSaoChep, setDaSaoChep] = useState<"prompt"|"follow"|"caption"|null>(null);
+  const [mucMo, setMucMo] = useState({initial:true,follow:false,caption:false});
   const tocDaChon = TOC.find((item) => item[0] === toc);
 
   const prompt = useMemo(() => `Use the two attached Model 01 images as strict identity references. I will attach the product image separately in ChatGPT; treat the last product image as the exact product reference.
@@ -290,6 +291,7 @@ Requirements:
   async function copyOnly(){const ok=await saoChep(prompt);setDaChuanBi(true);if(ok)hienTrangThaiDaChep("prompt");setThongBao(ok?"Prompt đã sẵn sàng — mở ChatGPT và dán sau khi đính kèm ảnh.":"Trình duyệt chặn sao chép. Hãy nhấn giữ nội dung prompt rồi chọn Tất cả → Sao chép.");}
   async function copyFollowUp(){const ok=await saoChep(followUpPrompt);if(ok)hienTrangThaiDaChep("follow");setThongBao(ok?"Prompt ảnh tiếp theo đã sẵn sàng — dán vào đúng cuộc trò chuyện đang dùng.":"Hãy nhấn giữ prompt tiếp nối rồi chọn Tất cả → Sao chép.");}
   async function copyCaption(){const ok=await saoChep(captionPrompt);if(ok)hienTrangThaiDaChep("caption");setThongBao(ok?"Prompt gợi ý caption đã sẵn sàng — dán vào cuộc trò chuyện sau khi tạo ảnh.":"Hãy nhấn giữ prompt caption rồi chọn Tất cả → Sao chép.");}
+  function doiTrangThaiMuc(muc: keyof typeof mucMo){setMucMo(current=>({...current,[muc]:!current[muc]}));}
 
   const Select = ({label,value,onChange,items}:{label:string;value:string;onChange:(v:string)=>void;items:string[]}) => <label><span>{label}</span><select value={value} onChange={(e)=>onChange(e.target.value)}>{items.map(i=><option key={i}>{i}</option>)}</select></label>;
   const PromptBox = ({label,value,kind,onCopy,ariaLabel}:{label:string;value:string;kind:"prompt"|"follow"|"caption";onCopy:()=>void;ariaLabel:string}) => {
@@ -330,12 +332,21 @@ Requirements:
         <textarea value={ghiChu} onChange={e=>setGhiChu(e.target.value)} placeholder="Yêu cầu thêm: cảm xúc, đạo cụ, chi tiết cần nhấn mạnh…" maxLength={400}/>
       </div>
       <div className="panel resultPanel">
-        <div className="resultTitle"><div><b>Chuyển sang ChatGPT</b><small>Model 01 · {toc} · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã chuẩn bị":"2 ảnh tham chiếu"}</span></div>
-        <div className="handoff">
-          <div className="handoffFiles"><span><img src="/model-01/turnaround.webp" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.webp" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
-          <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Sao chép prompt ngay trong khung bên dưới</span><span><i>2</i> Mở ChatGPT và thêm ảnh tham chiếu cùng ảnh sản phẩm</span><span><i>3</i> Dán prompt rồi gửi</span></div>
-          <PromptBox label="PROMPT ĐÃ SOẠN" value={prompt} kind="prompt" onCopy={copyOnly} ariaLabel="Sao chép prompt tạo ảnh bằng ChatGPT"/>
-          <div className="continuation">
+        <div className="resultTitle"><div><b>Quy trình nội dung</b><small>3 bước · Model 01 · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã bắt đầu":"Bắt đầu bước 1"}</span></div>
+        <div className="workflowSections">
+          <section className={`workflowSection ${mucMo.initial?"open":""}`}>
+            <button className="workflowToggle" onClick={()=>doiTrangThaiMuc("initial")} aria-expanded={mucMo.initial} aria-controls="initial-content"><span className="workflowNumber">1</span><span className="workflowLabel"><b>Initial image prompt</b><small>Tạo ảnh đầu tiên và khóa concept</small></span><span className="workflowChevron" aria-hidden="true">⌄</span></button>
+            {mucMo.initial&&<div className="workflowContent" id="initial-content">
+              <div className="handoffFiles"><span><img src="/model-01/turnaround.webp" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.webp" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
+              <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Sao chép prompt ngay trong khung bên dưới</span><span><i>2</i> Mở ChatGPT và thêm ảnh tham chiếu cùng ảnh sản phẩm</span><span><i>3</i> Dán prompt rồi gửi</span></div>
+              <PromptBox label="PROMPT ĐÃ SOẠN" value={prompt} kind="prompt" onCopy={copyOnly} ariaLabel="Sao chép prompt tạo ảnh bằng ChatGPT"/>
+              <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
+              <div className="downloadRefs"><span>Tải ảnh tham chiếu:</span><a href="/model-01/turnaround.webp" download>Ảnh nhận diện</a><a href="/model-01/hairstyles.webp" download>Bảng tóc</a></div>
+            </div>}
+          </section>
+          <section className={`workflowSection ${mucMo.follow?"open":""}`}>
+            <button className="workflowToggle" onClick={()=>doiTrangThaiMuc("follow")} aria-expanded={mucMo.follow} aria-controls="follow-content"><span className="workflowNumber">2</span><span className="workflowLabel"><b>Follow-up images prompt</b><small>Đổi góc, cảm xúc và chuyển động</small></span><span className="workflowChevron" aria-hidden="true">⌄</span></button>
+            {mucMo.follow&&<div className="workflowContent continuation" id="follow-content">
             <Select label="Ảnh tiếp theo cho AutoCut" value={anhTiepTheo} onChange={v=>setAnhTiepTheo(v as keyof typeof ANH_TIEP_THEO)} items={Object.keys(ANH_TIEP_THEO)}/>
             <Select label="Cảm xúc mới" value={camXucTiep} onChange={v=>setCamXucTiep(v as keyof typeof CAM_XUC_TIEP)} items={Object.keys(CAM_XUC_TIEP)}/>
             <Select label="Hướng người & hành động" value={huongDangTiep} onChange={v=>setHuongDangTiep(v as keyof typeof HUONG_DANG_TIEP)} items={Object.keys(HUONG_DANG_TIEP)}/>
@@ -344,16 +355,17 @@ Requirements:
             <Select label="Thay đổi hậu cảnh" value={doiCanhTiep} onChange={v=>setDoiCanhTiep(v as keyof typeof DOI_CANH_TIEP)} items={Object.keys(DOI_CANH_TIEP)}/>
             <PromptBox label="FOLLOW-UP PROMPT · GIỮ NGUYÊN CONCEPT" value={followUpPrompt} kind="follow" onCopy={copyFollowUp} ariaLabel="Sao chép prompt tạo ảnh tiếp theo"/>
             <button className={`copyFollow ${daSaoChep==="follow"?"copied":""}`} onClick={copyFollowUp} disabled={daSaoChep==="follow"} aria-label={daSaoChep==="follow"?"Đã sao chép prompt ảnh tiếp theo":"Sao chép prompt ảnh tiếp theo"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="follow"?"✓":"⧉"}</span><span>{daSaoChep==="follow"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt ảnh tiếp theo"}</span></button>
-          </div>
-          <div className="captionSection">
-            <div className="captionHeading"><div><b>Gợi ý caption TikTok</b><small>8 lựa chọn tiếng Việt · CTA nhẹ · hashtag vừa đủ</small></div><span>Cuối quy trình</span></div>
+            </div>}
+          </section>
+          <section className={`workflowSection ${mucMo.caption?"open":""}`}>
+            <button className="workflowToggle" onClick={()=>doiTrangThaiMuc("caption")} aria-expanded={mucMo.caption} aria-controls="caption-content"><span className="workflowNumber">3</span><span className="workflowLabel"><b>Caption &amp; hashtags</b><small>8 lựa chọn · CTA nhẹ · hashtag vừa đủ</small></span><span className="workflowChevron" aria-hidden="true">⌄</span></button>
+            {mucMo.caption&&<div className="workflowContent captionSection" id="caption-content">
             <PromptBox label="CAPTION PROMPT · DÁN SAU KHI TẠO ẢNH" value={captionPrompt} kind="caption" onCopy={copyCaption} ariaLabel="Sao chép prompt gợi ý caption TikTok"/>
             <button className={`copyFollow ${daSaoChep==="caption"?"copied":""}`} onClick={copyCaption} disabled={daSaoChep==="caption"} aria-label={daSaoChep==="caption"?"Đã sao chép prompt caption":"Sao chép prompt gợi ý caption"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="caption"?"✓":"⧉"}</span><span>{daSaoChep==="caption"?"Đã sao chép — dán vào ChatGPT":"Sao chép prompt gợi ý caption"}</span></button>
-          </div>
+            </div>}
+          </section>
         </div>
-        <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
         {thongBao&&<p className="message" role="status" aria-live="polite">{thongBao}</p>}
-        <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.webp" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.webp" download>Tải bảng tóc</a></div>
         <div className="checklist"><b>Kiểm tra trước khi đăng</b><span>✓ Khuôn mặt nhất quán</span><span>✓ Sản phẩm chính xác</span><span>✓ Bối cảnh có chiều sâu</span><span>Nhớ bật nhãn nội dung do AI tạo trên TikTok.</span></div>
       </div>
     </section>
