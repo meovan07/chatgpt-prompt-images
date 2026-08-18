@@ -293,7 +293,7 @@ Requirements:
     setDangXuLy(true); setThongBao("Đang chuẩn bị concept và ảnh tham chiếu…");
     try {
       const copied=await saoChep(prompt);
-      const files=[await layTep("/model-01/turnaround.png","model-01-goc-nhin.png"),await layTep("/model-01/hairstyles.png","model-01-kieu-toc.png")];
+      const files=[await layTep("/model-01/turnaround.webp","model-01-goc-nhin.webp"),await layTep("/model-01/hairstyles.webp","model-01-kieu-toc.webp")];
       setDaChuanBi(true);
       if(navigator.share&&navigator.canShare?.({files})){
         try{setThongBao(`${copied?"Đã sao chép prompt. ":"Prompt ở bên dưới. "}Hãy chọn ChatGPT, sau đó thêm ảnh sản phẩm.`);await navigator.share({files,title:"Tham chiếu Model 01"});}
@@ -312,7 +312,7 @@ Requirements:
 
   return <main>
     <header className="topbar"><div className="brand"><span className="brandMark">M1</span><span>Studio Người Mẫu</span></div><div className="secure"><span/> Không gian riêng tư</div></header>
-    <section className="hero"><div><p className="eyebrow">SÁNG TẠO TIKTOK AFFILIATE</p><h1>Một người mẫu.<br/><em>Mọi phong cách.</em></h1><p className="subhead">Chọn concept, trang điểm và phụ kiện. Sản phẩm sẽ được thêm trực tiếp trong ChatGPT.</p></div><div className="modelCard"><img src="/model-01/turnaround.png" alt="Các góc nhìn Model 01"/><div><b>MODEL 01</b><span>Đã khóa nhận diện</span></div></div></section>
+    <section className="hero"><div><p className="eyebrow">SÁNG TẠO TIKTOK AFFILIATE</p><h1>Một người mẫu.<br/><em>Mọi phong cách.</em></h1><p className="subhead">Chọn concept, trang điểm và phụ kiện. Sản phẩm sẽ được thêm trực tiếp trong ChatGPT.</p></div><div className="modelCard"><img src="/model-01/turnaround.webp" alt="Các góc nhìn Model 01"/><div><b>MODEL 01</b><span>Đã khóa nhận diện</span></div></div></section>
     <section className="workspace">
       <div className="panel controls">
         <div className="step"><span>1</span><div><b>Chọn kiểu tóc</b><small>Khuôn mặt và hình thể luôn được giữ nguyên</small></div></div>
@@ -344,7 +344,7 @@ Requirements:
       <div className="panel resultPanel">
         <div className="resultTitle"><div><b>Chuyển sang ChatGPT</b><small>Model 01 · {toc} · ảnh dọc 9:16</small></div><span className="statusDot">{daChuanBi?"Đã chuẩn bị":"2 ảnh tham chiếu"}</span></div>
         <div className="handoff">
-          <div className="handoffFiles"><span><img src="/model-01/turnaround.png" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.png" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
+          <div className="handoffFiles"><span><img src="/model-01/turnaround.webp" alt="Ảnh nhận diện"/><b>Nhận diện</b></span><span><img src="/model-01/hairstyles.webp" alt="Bảng kiểu tóc"/><b>Kiểu tóc</b></span><span><i>＋</i><b>Thêm sản phẩm trong ChatGPT</b></span></div>
           <div className="handoffSteps"><b>Thực hiện trên điện thoại</b><span><i>1</i> Bấm “Chia sẻ sang ChatGPT”</span><span><i>2</i> Thêm ảnh sản phẩm trực tiếp trong ChatGPT</span><span><i>3</i> Dán prompt đã sao chép và gửi</span></div>
           <div className="promptPreview"><span>PROMPT ĐÃ SOẠN — NHẤN GIỮ ĐỂ SAO CHÉP</span><textarea readOnly value={prompt} aria-label="Prompt tạo ảnh bằng ChatGPT"/></div>
           <div className="continuation">
@@ -364,7 +364,7 @@ Requirements:
           </div>
         </div>
         <div className="actions"><button className={daSaoChep==="prompt"?"copied":""} onClick={copyOnly} disabled={daSaoChep==="prompt"}><span className="copyIcon" aria-hidden="true">{daSaoChep==="prompt"?"✓":"⧉"}</span>{daSaoChep==="prompt"?"Đã sao chép":"Chỉ sao chép prompt"}</button><a href="https://chatgpt.com/" target="_blank" rel="noreferrer">Mở ChatGPT</a></div>
-        <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.png" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.png" download>Tải bảng tóc</a></div>
+        <div className="downloadRefs"><span>Nếu bị chặn chia sẻ:</span><a href="/model-01/turnaround.webp" download>Tải ảnh nhận diện</a><a href="/model-01/hairstyles.webp" download>Tải bảng tóc</a></div>
         <div className="checklist"><b>Kiểm tra trước khi đăng</b><span>✓ Khuôn mặt nhất quán</span><span>✓ Sản phẩm chính xác</span><span>✓ Bối cảnh có chiều sâu</span><span>Nhớ bật nhãn nội dung do AI tạo trên TikTok.</span></div>
       </div>
     </section>
