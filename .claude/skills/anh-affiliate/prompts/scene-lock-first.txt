@@ -1,0 +1,13 @@
+Attachment order: images 1–7 = Model 02 identity references (turnaround, face close-ups, side angles 0–180°, head poses, camera angles). Image 8 = the product worn by someone else (fit and drape only — ignore that person). Image 9 = the exact product{{COLOR_LINE}}. Image 10 = SCENE AND POSE REFERENCE.
+
+TASK: create a NEW photorealistic vertical 9:16 smartphone photo that recreates the scene of image 10 with Model 02 in it.
+
+LOCK FROM IMAGE 10: camera position and height, lens feel, framing and crop, the foreground objects, the background and location type, light direction, time of day and colour mood, and the person's pose, body angle, hand positions and gaze direction.
+
+REPLACE THE PERSON COMPLETELY: the woman must be Model 02 — her face, skin tone, eyes, nose, lips, bangs and body exactly as in images 1–7 (fictional Vietnamese woman, warm light-beige skin with golden-olive undertone, visible pores, natural asymmetries). Keep nothing of the reference person's face or identity. Choose the Model 02 face angle that matches the reference head pose.
+
+OUTFIT: the exact product from image 9 — {{PRODUCT_NOTE}} — styled with {{STYLING}}; keep a bag only if the reference has one. The product must be clearly readable.
+
+MAKE IT ORIGINAL: this is a new photo, not a copy. Remove every readable sign, menu text, cup branding, logo and watermark; vary small props slightly (cup, menu, plants, passers-by) while keeping the same overall scene and depth. Background people must be different individuals with non-prominent faces.
+
+REALISM: candid phone photo with natural local contrast, real skin texture (no airbrushing, no beauty filter, no K-pop idol look), believable light falloff, slight grain, natural hands and anatomy. No text, watermark or interface elements.
