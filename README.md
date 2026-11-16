@@ -87,6 +87,16 @@ or enforce explicit server-side membership or allowlist checks.
 Use SIWC for account pages, user-specific dashboards, saved records, and write
 actions tied to the current ChatGPT user. Leave public content anonymous.
 
+## Affiliate workflows
+
+Claude Code skills under `.claude/skills/` for TikTok Affiliate (outputs go to gitignored `outputs/`):
+
+- `/anh-affiliate <link>` - TikTok Shop link to 4 Model 02 lifestyle photos via ChatGPT web.
+- `/video-affiliate <job>` - job folder to a posted TikTok video (trend captions, CapCut template, commercial sound).
+- `/affiliate-video <link | job>` - full pipeline, resumable via `job.md`.
+
+Flow: `/affiliate-video <link>` = `/anh-affiliate` then `/video-affiliate`.
+
 ## Useful Commands
 
 - `npm run dev`: start local development

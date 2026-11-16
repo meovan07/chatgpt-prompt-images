@@ -8,6 +8,8 @@ argument-hint: <thư mục job hoặc link TikTok Shop> [ghi chú]
 
 No API keys, no deploy. Runs on the user's phone (TikTok + CapCut) through iPhone Mirroring. Talk to the user in Vietnamese, tersely. The old AutoCut flow looked like a slideshow, had cheesy effects and was off-beat — never fall back to it.
 
+When invoked from `/affiliate-video`, follow that file's checkpoints and `job.md` state file, and skip this skill's Finish/stop.
+
 ## Hard rules
 
 - Never solve a CAPTCHA, log in, sign up or accept terms for the user. On any of these: stop, say what you see, wait.
