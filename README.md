@@ -97,6 +97,8 @@ Claude Code skills under `.claude/skills/` for TikTok Affiliate (outputs go to g
 
 Flow: `/affiliate-video <link>` = `/anh-affiliate` then `/video-affiliate`.
 
+Runs on Mac and Windows; OS-specific steps live in `.claude/skills/affiliate-video/platform/{mac,windows}.md`. Windows needs ImageMagick (`winget install ImageMagick.ImageMagick`) and Zalo PC; `adb` is optional for Android.
+
 ## Useful Commands
 
 - `npm run dev`: start local development

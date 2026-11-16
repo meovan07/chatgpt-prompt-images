@@ -6,7 +6,7 @@ LOCK FROM IMAGE 10: camera position and height, lens feel, framing and crop, the
 
 REPLACE THE PERSON COMPLETELY: the woman must be Model 02 — her face, skin tone, eyes, nose, lips, bangs and body exactly as in images 1–7 (fictional Vietnamese woman, warm light-beige skin with golden-olive undertone, visible pores, natural asymmetries). Keep nothing of the reference person's face or identity. Choose the Model 02 face angle that matches the reference head pose.
 
-OUTFIT: the exact product from image 9 — {{PRODUCT_NOTE}} — styled with {{STYLING}}; keep a bag only if the reference has one. The product must be clearly readable.
+OUTFIT: the exact product from image 9 — {{PRODUCT_NOTE}} — styled with {{STYLING}}; keep a bag only if the reference has one. The product must be clearly readable. IGNORE the top/outfit worn in image 10: she wears ONLY the product from image 9; garment type, straps and neckline must match the product, not the reference.
 
 MAKE IT ORIGINAL: this is a new photo, not a copy. Remove every readable sign, menu text, cup branding, logo and watermark; vary small props slightly (cup, menu, plants, passers-by) while keeping the same overall scene and depth. Background people must be different individuals with non-prominent faces.
 
