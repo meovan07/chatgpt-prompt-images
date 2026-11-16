@@ -1,0 +1,21 @@
+Write 3 TikTok captions in Vietnamese for an affiliate video.
+
+Product: {{PRODUCT}}
+Category: {{CATEGORY}}
+What the 4 scenes show: {{SCENES}}
+
+Trend patterns that repeat in the top videos of this category (borrow the sentence pattern, never copy the text):
+{{TREND_PATTERNS}}
+
+Hashtag pool taken from the scanned videos:
+{{HASHTAG_POOL}}
+
+Rules:
+- Exactly 3 options. Each borrows a DIFFERENT pattern from the list above, with the product worked in naturally.
+- Lowercase everyday Vietnamese, the way a friend types. One short line.
+- No call-to-action, no ad voice, no "mua ngay", no "link ở giỏ hàng".
+- Do not invent facts: no price, discount, material, sizing or performance claims. Only use what is in the product and scene info above.
+- 0 or 1 emoji per caption.
+- 3 to 5 hashtags per caption, chosen only from the hashtag pool. No generic viral stuffing.
+
+Output Vietnamese only, numbered 1 to 3. Under each caption, one line naming the borrowed pattern.

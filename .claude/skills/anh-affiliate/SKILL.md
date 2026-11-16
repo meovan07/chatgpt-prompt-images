@@ -8,6 +8,8 @@ argument-hint: <link TikTok Shop> [ghi chú]
 
 No API keys, no deploy. Runs in the user's own Chrome (Claude in Chrome) with their own ChatGPT login, plus iPhone Mirroring when TikTok web blocks. Talk to the user in Vietnamese, tersely. **The workflow ends when the images are saved and reported** — do not write captions, message anyone or post anything unless the user asks separately.
 
+When invoked from `/affiliate-video`, follow that file's checkpoints and `job.md` state file, and skip this skill's Finish/stop.
+
 ## Hard rules
 
 - Never solve a CAPTCHA, log in, sign up or accept terms for the user. On a captcha, login wall or ChatGPT usage-limit message: stop, say what you see, wait.
@@ -44,4 +46,4 @@ No API keys, no deploy. Runs in the user's own Chrome (Claude in Chrome) with th
 
 ## Finish
 
-Report in Vietnamese, short: job folder, the 4 saved images (note any aspect ratio other than 9:16 or visible issues), ChatGPT chat link, and the remaining manual steps (AutoCut → Nhạc bán hàng → gắn sản phẩm → bật nhãn nội dung AI). Then stop.
+Report in Vietnamese, short: job folder, the 4 saved images (note any aspect ratio other than 9:16 or visible issues), ChatGPT chat link, and the next step: run `/video-affiliate` on the job folder for caption, template, sound and posting (or `/affiliate-video` for the one-shot flow). Then stop.
