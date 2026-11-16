@@ -44,4 +44,4 @@ No API keys, no deploy. Runs in the user's own Chrome (Claude in Chrome) with th
 
 ## Finish
 
-Report in Vietnamese, short: job folder, the 4 saved images (note any aspect ratio other than 9:16 or visible issues), ChatGPT chat link, and the remaining manual steps (AutoCut → Nhạc bán hàng → gắn sản phẩm → bật nhãn nội dung AI). Then stop.
+Report in Vietnamese, short: job folder, the 4 saved images (note any aspect ratio other than 9:16 or visible issues), ChatGPT chat link, and the next step: run `/video-affiliate` on the job folder for caption, template, sound and posting. Then stop.
